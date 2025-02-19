@@ -6,13 +6,13 @@ app = Flask(__name__)
 def index():
     return render_template('input.html')
 
-@app.route('/codons_input', methods=['POST'])
+@app.route('/codons_list', methods=['POST'])
 def prototype():
     # Create an field to enter the desired Codons
     # Create a field to decide wheather you want 2,3,4 codons set.
     # Create submit field.
     # Create an import and export button
-    codons = request.form['codons_list']
+    codons = request.form['codons']
     number_of_codons = request.form['number_of_codons']
     automation(int(number_of_codons),codons)
-    return codons
+    return render_template('codons_list.html')
