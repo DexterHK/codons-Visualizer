@@ -15,4 +15,4 @@ def prototype():
     codons = request.form['codons']
     number_of_codons = request.form['number_of_codons']
     automation(int(number_of_codons),codons)
-    return render_template('../codons_list.html')
+    return render_template('codons_list.html')
