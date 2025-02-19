@@ -299,8 +299,8 @@ def draw_arrows(net: Network):
 
 
 
-def set_up_graph():
-    parsed_input = parseinput(3, TEMP_INPUT5)
+def set_up_graph(number_of_codons,codons):
+    parsed_input = parseinput(number_of_codons, codons)
     codons_broke_down = process_codons(parsed_input)
     all_rows = codons_broke_down["rows"]
 
@@ -373,7 +373,7 @@ def set_up_graph():
 
     net.generate_html(notebook=False)
 
-    html_filename = 'cities.html'
+    html_filename = 'codons_list.html'
     with open(html_filename, 'w', encoding='utf-8') as f:
         f.write(net.html)
 
@@ -383,9 +383,7 @@ def set_up_graph():
 
 # Example usage:
 TEMP_INPUT = (
-    "GCAGCCGCGGCTTGCTGTGACGATGAAGAGTTCTTTGGAGGCGGGGGTCACCATATAATCATTAAAAAGCTACTCCTGCTTTT"
-    "ATTGATGAACAATCCACCCCCGCCTCAACAGAGAAGGCGACGCCGGCGTTAATAGTGAAGCAGTTCATCCTCGTCTACAACCA"
-    "CGACTGTAGTCGTGGTTTGGTACTAT"
+    "GCAGCCGCGGCTTGCTGTGACGATGAAGAGTTCTTTGGAGGCGGGGGTCACCATATAATCATTAAAAAGCTACTCCTGCTTTTATTGATGAACAATCCACCCCCGCCTCAACAGAGAAGGCGACGCCGGCGTTAATAGTGAAGCAGTTCATCCTCGTCTACAACCACGACTGTAGTCGTGGTTTGGTACTAT"
 )
 TEMP_INPUT1 = (
     "GCAGCCGCGGCTTGCTGTGACGATGAAGAG"
@@ -419,4 +417,4 @@ def automation(number,codon_input):
     print("is circular:",is_circular_code(parsed_input))
     print("is it comma-free:", is_comma_free(parsed_input))
     print("is it duplicate free:",is_duplicate_free(parsed_input))
-    set_up_graph()
+    set_up_graph(number,codon_input)
