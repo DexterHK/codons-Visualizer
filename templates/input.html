@@ -33,7 +33,14 @@
     </div>
     </form>
         
-
+    <script>
+      // JavaScript to filter input in real-time
+      const inputField = document.querySelector('input[name="codons"]');
+      inputField.addEventListener('input', function() {
+        // Convert the input to uppercase and remove any characters other than C, G, T, or A
+        this.value = this.value.toUpperCase().replace(/[^CGTA]/g, '');
+      });
+    </script>
     
   </div>
 
