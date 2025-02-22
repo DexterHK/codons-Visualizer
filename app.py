@@ -14,5 +14,6 @@ def prototype():
     # Create an import and export button
     codons = request.form['codons']
     number_of_codons = request.form['number_of_codons']
-    automation(int(number_of_codons),codons)
-    return render_template('codons_list.html')
+    html_filename = automation(int(number_of_codons),codons)
+    print(html_filename)
+    return render_template(str(html_filename))
