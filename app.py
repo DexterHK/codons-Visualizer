@@ -1,4 +1,3 @@
-import os
 from flask import Flask, Response, after_this_request, request,render_template, send_file,url_for
 from first_normal_prototype import automation
 app = Flask(__name__)
