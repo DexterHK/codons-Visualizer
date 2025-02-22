@@ -1,4 +1,5 @@
-from flask import Flask, request,render_template,url_for
+import os
+from flask import Flask, Response, after_this_request, request,render_template, send_file,url_for
 from first_normal_prototype import automation
 app = Flask(__name__)
 
@@ -14,6 +15,12 @@ def prototype():
     # Create an import and export button
     codons = request.form['codons']
     number_of_codons = request.form['number_of_codons']
-    html_filename = automation(int(number_of_codons),codons)
-    print(html_filename)
-    return render_template(str(html_filename))
+    html_content = automation(int(number_of_codons),codons) #77777
+    print(html_content)
+    #return render_template(str(html_filename))
+    return Response(
+        html_content,
+        mimetype="text/html",
+        headers={"Content-Disposition": "inline; filename=codon_list.html"}
+    )
+
