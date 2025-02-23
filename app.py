@@ -15,7 +15,6 @@ def prototype():
     codons = request.form['codons']
     number_of_codons = request.form['number_of_codons']
     html_content = automation(int(number_of_codons),codons) #77777
-    print(html_content)
     #return render_template(str(html_filename))
     return Response(
         html_content,
