@@ -1,7 +1,7 @@
 import csv
 import io
 from flask import Flask, Response, after_this_request, request,render_template, send_file,url_for, session
-from first_normal_prototype import automation, export_csv
+from first_normal_prototype import automation, export_csv, parseinput
 app = Flask(__name__)
 
 
@@ -15,7 +15,14 @@ def index():
 def prototype():
     session['codons'] = request.form['codons']
     session['number_of_codons'] = request.form['number_of_codons']
-    button = '''
+    html_content = auto_visual(session['number_of_codons'],session['codons'])
+    return Response(
+        html_content,
+        mimetype="text/html",
+        headers={"Content-Disposition": "inline; filename=codon_list.html"}
+    )
+def auto_visual(codon_number,codons):
+    codon_button = '''
     <style>
     /* 15 */
 .btn-15 {
@@ -75,13 +82,9 @@ def prototype():
         <button name="export_button" class="custom-btn btn-15">Export</button>
       </form>
     </div>'''
-    html_content = button + automation(int(session['number_of_codons']), session['codons'])
+    html_content = codon_button + automation(int(codon_number), codons)
     #return render_template(str(html_filename))
-    return Response(
-        html_content,
-        mimetype="text/html",
-        headers={"Content-Disposition": "inline; filename=codon_list.html"}
-    )
+    return html_content
 
 @app.route('/export', methods=['POST'])
 def export():
@@ -105,13 +108,46 @@ def export():
 
 
 
-"""
-@app.route('/import', methods=['POST'])
-def importing():
 
-    return Response(
+@app.route('/codon_list', methods=['POST'])
+def importing():
+       # Retrieve the uploaded file from the form (make sure the input name is "file")
+    file = request.files.get('file')
+    if not file:
+        return Response("No file uploaded.", status=400)
+
+    try:
+        # Read file content and decode it
+        stream = io.StringIO(file.stream.read().decode("utf-8"))
+        reader = csv.reader(stream)
+        
+        codons_list = []
+        for row in reader:
+            if row:  # Ensure the row is not empty
+                codon = row[0].strip()
+                codons_list.append(codon)
+        
+        if not codons_list:
+            return Response("No codons found in the file.", status=400)
+        
+        # Determine the length of the codons (assuming they are all the same length)
+        codon_length = len(codons_list[0])
+        
+        # Convert the list of codons to a single string with newline separators
+        codons_str = "\n".join(codons_list)
+        
+        # Optionally, you might want to store this data in the session for further processing
+        session['codons'] = codons_str
+        session['number_of_codons'] = codon_length  # or some other value as needed
+        session['codons']
+        html_content = auto_visual(int(session['number_of_codons']),session['codons'])
+        return Response(
         html_content,
         mimetype="text/html",
         headers={"Content-Disposition": "inline; filename=codon_list.html"}
     )
-"""
+
+    
+    except Exception as e:
+        return Response(f"Error processing file: {e}", status=500)
+
