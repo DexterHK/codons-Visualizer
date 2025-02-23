@@ -1,3 +1,4 @@
+import csv
 import pandas as pd
 import networkx as nx
 from pyvis.network import Network
@@ -49,6 +50,7 @@ def process_codons(codons: list) -> dict:
     for order, left, right in connection_rows:
         all_rows.append((order, 1, left, right))
     all_rows.sort(key=lambda x: (x[0], x[1]))
+
 
     output_rows = [[left, right] for _, _, left, right in all_rows]
     return {"rows": output_rows}
@@ -299,7 +301,13 @@ def draw_arrows(net: Network):
         processed_keys.add(key)
     return combined_edges
 
-
+def export_csv(number_of_codons,codons):
+    parsed_input = parseinput(number_of_codons, codons)
+    all_rows = process_codons(parsed_input)
+    all_rows_without_rows = all_rows['rows']
+    print(all_rows_without_rows)
+    return all_rows_without_rows
+    
 
 def set_up_graph(number_of_codons,codons):
     parsed_input = parseinput(number_of_codons, codons)
