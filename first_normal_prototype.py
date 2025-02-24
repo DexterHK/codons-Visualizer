@@ -208,7 +208,6 @@ def is_circular_code(code):
     
     # Build the graph from the code.
     graph = build_graph_from_code(code)
-    print(graph)
     # The code is circular if the graph is acyclic.
     return not has_cycle(graph)
 
@@ -253,11 +252,9 @@ def is_duplicate_free(code):
 # ----------------------------------------------------------------
 def detect_cycles(graph):
     cycles = []
-    def all_neighbors(n):
-        return set(graph.successors(n)).union(set(graph.predecessors(n)))
     def dfs(start, current, path):
-        for neighbor in all_neighbors(current):
-            if neighbor == start and len(path) >= 3:
+        for neighbor in graph.successors(current):
+            if neighbor == start and len(path) >= 2:
                 cycles.append(path + [start])
             elif neighbor not in path:
                 dfs(start, neighbor, path + [neighbor])
@@ -305,7 +302,6 @@ def export_csv(number_of_codons,codons):
     parsed_input = parseinput(number_of_codons, codons)
     all_rows = process_codons(parsed_input)
     all_rows_without_rows = all_rows['rows']
-    print(all_rows_without_rows)
     return all_rows_without_rows
     
 
