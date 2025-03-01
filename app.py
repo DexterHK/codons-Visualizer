@@ -130,17 +130,15 @@ def importing():
         if not codons_list:
             return Response("No codons found in the file.", status=400)
         
-        # Determine the length of the codons (assuming they are all the same length)
-        codon_length = len(codons_list[0])
         
         # Convert the list of codons to a single string with newline separators
         codons_str = "\n".join(codons_list)
         
         # Optionally, you might want to store this data in the session for further processing
         session['codons'] = codons_str
-        session['number_of_codons'] = codon_length  # or some other value as needed
+        session['number_of_codons_file'] = request.form['number_of_codons_file']  # or some other value as needed
         session['codons']
-        html_content = auto_visual(int(session['number_of_codons']),session['codons'])
+        html_content = auto_visual(int(session['number_of_codons_file']),session['codons'])
         return Response(
         html_content,
         mimetype="text/html",

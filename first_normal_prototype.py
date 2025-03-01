@@ -6,7 +6,112 @@ import webbrowser
 import os
 import glob
 
-def process_codons(codons: list) -> dict:
+# Works for 4 only 
+def process_codons_2_2(codons: list) -> dict:
+    codon_length = len(codons[0])
+    if codon_length == 4:
+            print("fucked")
+            return
+    groups = {}
+    for i, codon in enumerate(codons):
+        prefix = codon[:2]
+        groups.setdefault(prefix, []).append((i, codon))
+
+    suffix_map = {}
+    for i, codon in enumerate(codons):
+        suffix = codon[-2:]
+        suffix_map.setdefault(suffix, []).append(i)
+
+    default_rows = []
+    connection_rows = []
+
+    for prefix, items in groups.items():
+        items.sort(key=lambda x: x[0])
+        if len(items) < 3:
+            for i, codon in items:
+                default_rows.append((i, codon[0] + codon[1], codon[1:]))
+        else:
+            count = 0
+            for i, codon in items:
+                if count < 2:
+                    default_rows.append((i, codon[0] + codon[1], codon[1:]))
+                    count += 1
+                else:
+                    if prefix in suffix_map:
+                        order_index = min(suffix_map[prefix])
+                        connection_rows.append((order_index, codon[:2], codon[2]))
+                        break
+                    else:
+                        default_rows.append((i, codon[0]+ codon[1], codon[1:]))
+                        count += 1
+
+    all_rows = []
+    for order, left, right in default_rows:
+        all_rows.append((order, 0, left, right))
+    for order, left, right in connection_rows:
+        all_rows.append((order, 1, left, right))
+    all_rows.sort(key=lambda x: (x[0], x[1]))
+
+
+    output_rows = [[left, right] for _, _, left, right in all_rows]
+    return {"rows": output_rows}
+
+# Works for 4 and 3 
+#GTTAATAGTGAAGCAGTTCATCCTCGTCTACAACCA
+def process_codons_rest_1(codons: list) -> dict:
+    codon_length = len(codons[0])
+    if codon_length > 5 or codon_length < 2:
+        return {"rows": []}
+        
+    groups = {}
+    for i, codon in enumerate(codons):
+        # Group based on the substring from index 2 to the end
+        prefix = codon[2:]
+        groups.setdefault(prefix, []).append((i, codon))
+
+    suffix_map = {}
+    for i, codon in enumerate(codons):
+        suffix = codon[-2:]
+        suffix_map.setdefault(suffix, []).append(i)
+
+    default_rows = []
+    connection_rows = []
+
+    for prefix, items in groups.items():
+        items.sort(key=lambda x: x[0])
+        if len(items) < 3:
+            for i, codon in items:
+                # Use first two letters and the last character as before
+                default_rows.append((i, codon[:2], codon[-1:]))
+        else:
+            count = 0
+            for i, codon in items:
+                if count < 2:
+                    default_rows.append((i, codon[:2], codon[-1:]))
+                    count += 1
+                else:
+                    if prefix in suffix_map:
+                        order_index = min(suffix_map[prefix])
+                        connection_rows.append((order_index, codon[:2], codon[2:]))
+                        break
+                    else:
+                        default_rows.append((i, codon[:2], codon[-1:]))
+                        count += 1
+
+    all_rows = []
+    for order, left, right in default_rows:
+        all_rows.append((order, 0, left, right))
+    for order, left, right in connection_rows:
+        all_rows.append((order, 1, left, right))
+    all_rows.sort(key=lambda x: (x[0], x[1]))
+
+    output_rows = [[left, right] for _, _, left, right in all_rows]
+    return {"rows": output_rows}
+
+
+
+    # Works for 2,3,4
+def process_codons_1_rest(codons: list) -> dict:
     codon_length = len(codons[0])
     groups = {}
     for i, codon in enumerate(codons):
@@ -35,14 +140,12 @@ def process_codons(codons: list) -> dict:
                 else:
                     if prefix in suffix_map:
                         order_index = min(suffix_map[prefix])
-                        if codon_length == 2:
-                            connection_rows.append((order_index, codon[:1], codon[1]))
-                        else:
-                            connection_rows.append((order_index, codon[:2], codon[2]))
+                        connection_rows.append((order_index, codon[:2], codon[2:]))
                         break
                     else:
                         default_rows.append((i, codon[0], codon[1:]))
                         count += 1
+
 
     all_rows = []
     for order, left, right in default_rows:
@@ -57,11 +160,14 @@ def process_codons(codons: list) -> dict:
 
 def remove_spaces(s: str) -> str:
     return s.replace(" ", "")
+def remove_backslashes(s: str) -> str:
+    return s.replace("\n", "")
 
 def parseinput(codon_length: int, codons: str) -> list:
     if codon_length > 4 or codon_length < 1:
         return []
     codonsy = remove_spaces(codons)
+    codonsy = remove_backslashes(codonsy)
     return [codonsy[i:i+codon_length] for i in range(0, len(codonsy), codon_length)]
 
 
@@ -300,14 +406,59 @@ def draw_arrows(net: Network):
 
 def export_csv(number_of_codons,codons):
     parsed_input = parseinput(number_of_codons, codons)
-    all_rows = process_codons(parsed_input)
+    all_rows = process_codons_1_rest(parsed_input)
     all_rows_without_rows = all_rows['rows']
     return all_rows_without_rows
+
+def merge_rows(dict1, dict2):
+    # Create a set of tuples for the rows in dict2 for fast lookup.
+    existing = {tuple(row) for row in dict2["rows"]}
+    # Loop over each pair in dict1["rows"]
+    for row in dict1["rows"]:
+        # If the pair doesn't exist in dict2, add it.
+        if tuple(row) not in existing:
+            dict2["rows"].append(row)
+            existing.add(tuple(row))
+    return dict2
+
+def merge_rows(dict1, dict2):
+    # Get the lists of pairs from each dictionary (default to empty list if missing)
+    list1 = dict1.get('rows', [])
+    list2 = dict2.get('rows', [])
     
+    # Combine the two lists of pairs
+    combined = list1 + list2
+    
+    # Use a set to store unique pairs (in uppercase)
+    unique_pairs_set = set()
+    unique_pairs_list = []
+    for pair in combined:
+        # Convert pair to a tuple of uppercase strings (for case-insensitive comparison)
+        upper_pair = tuple(str(item).upper() for item in pair)
+        if upper_pair not in unique_pairs_set:
+            unique_pairs_set.add(upper_pair)
+            unique_pairs_list.append(upper_pair)
+    
+    # Return the result in the desired format
+    return {'rows': unique_pairs_list}
+
+
+def last_parse(number_of_codons,codons):
+    parsed_input = parseinput(number_of_codons, codons)
+    codons_broke_down = process_codons_1_rest(parsed_input)
+    print(codons_broke_down)
+    if number_of_codons == 3 or number_of_codons == 4:
+        codons_broke_down3 = process_codons_rest_1(parsed_input)
+        print("second",codons_broke_down3)
+        codons_broke_down = merge_rows(codons_broke_down,codons_broke_down3)
+        print("thirds",codons_broke_down)
+    if number_of_codons == 4 :
+        codons_broke_down2 = process_codons_2_2(parsed_input) 
+        codons_broke_down = merge_rows(codons_broke_down,codons_broke_down2)
+    return codons_broke_down
 
 def set_up_graph(number_of_codons,codons):
-    parsed_input = parseinput(number_of_codons, codons)
-    codons_broke_down = process_codons(parsed_input)
+    codons_broke_down = last_parse(number_of_codons,codons)
     all_rows = codons_broke_down["rows"]
 
     df_edges = pd.DataFrame(all_rows, columns=["from", "to"])
@@ -365,7 +516,7 @@ def set_up_graph(number_of_codons,codons):
     },
     "physics": {
         "enabled": true,
-        "solver": "forceAtlas2Based",
+        "solver": "forceAtlas2Based", 
         "stabilization": {
         "enabled": false
         }
