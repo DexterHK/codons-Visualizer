@@ -9,7 +9,7 @@ import glob
 # Works for 4 only 
 def process_codons_2_2(codons: list) -> dict:
     codon_length = len(codons[0])
-    if codon_length == 4:
+    if codon_length != 4:
             print("fucked")
             return
     groups = {}
@@ -170,6 +170,25 @@ def parseinput(codon_length: int, codons: str) -> list:
     codonsy = remove_backslashes(codonsy)
     return [codonsy[i:i+codon_length] for i in range(0, len(codonsy), codon_length)]
 
+#-------------------
+# Alpha 1 and 2 
+#-------------------
+
+def shift_string(s: str, shift: int) -> str:
+
+    if not s:
+        return s  # Return the empty string if input is empty
+
+    # Calculate the effective shift using modulo, which handles shifts greater than the string length
+    effective_shift = shift % len(s)
+
+    return s[-effective_shift:] + s[:-effective_shift]
+
+def alph1(s : str) -> str:
+    return shift_string(s,1)
+
+def alph2(s : str) -> str:
+    return shift_string(s,-1)
 
 #---------------------
 # From paper_1
@@ -455,6 +474,7 @@ def last_parse(number_of_codons,codons):
     if number_of_codons == 4 :
         codons_broke_down2 = process_codons_2_2(parsed_input) 
         codons_broke_down = merge_rows(codons_broke_down,codons_broke_down2)
+        print("fourth",codons_broke_down)
     return codons_broke_down
 
 def set_up_graph(number_of_codons,codons):
