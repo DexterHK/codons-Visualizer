@@ -1,0 +1,24 @@
+.layout-buttons {
+  position: absolute;
+  z-index: 1;
+  background: #313131;
+  bottom: 1rem;
+  right: 1rem;
+  box-shadow: 5px 5px 15px 0 #181818;
+  padding: 0.6rem;
+  margin-top: 1rem;
+  border-radius: 15px;
+  display: flex;
+  gap: 0.5rem;
+}
+
+.layout-buttons button {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 1rem;
+}
+
+.layout-buttons button.active {
+  border: 1px solid #646cff;
+}

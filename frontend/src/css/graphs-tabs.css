@@ -1,0 +1,23 @@
+.tabs {
+  position: absolute;
+  z-index: 1;
+  left: 50%;
+  transform: translateX(-50%);
+  background: #313131;
+  box-shadow: 5px 5px 15px 0 #181818;
+  padding: 0.6rem ;
+  margin-top: 1rem;
+  border-radius: 15px;
+}
+
+.tabs ul {
+  margin: 0;
+  list-style: none;
+  display: flex;
+  gap: 0.5rem;
+  padding: 0;
+}
+
+.tabs ul li.active button {
+  border: 1px solid #646cff;
+}

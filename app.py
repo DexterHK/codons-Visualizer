@@ -1,151 +1,156 @@
-import csv
-import io
-from flask import Flask, Response, after_this_request, request,render_template, send_file,url_for, session
-from first_normal_prototype import automation, export_csv, parseinput
+from flask import Flask, Response, request, render_template, jsonify
+from first_normal_prototype import  get_graph , get_graph_alpha_one , get_graph_alpha_two, longest_path ,properties , properties_alpha_one ,properties_alpha_two ,c3
+from flask_cors import CORS, cross_origin
+
 app = Flask(__name__)
+cors = CORS(app) # allow CORS for all domains on all routes.
+app.config['CORS_HEADERS'] = 'Content-Type'
 
-
-app.secret_key = 'AnySecretKey'  # Required for session management
-
-@app.route('/')
+@app.route("/")
 def index():
-    return render_template('input.html')
+    return render_template("input.html")
 
-@app.route('/codons_list', methods=['POST'])
-def prototype():
-    session['codons'] = request.form['codons']
-    session['number_of_codons'] = request.form['number_of_codons']
-    html_content = auto_visual(session['number_of_codons'],session['codons'])
-    return Response(
-        html_content,
-        mimetype="text/html",
-        headers={"Content-Disposition": "inline; filename=codon_list.html"}
-    )
-def auto_visual(codon_number,codons):
-    codon_button = '''
-    <style>
-    /* 15 */
-.btn-15 {
-    background: #b621fe;
-    border: none;
-    z-index: 1;
-  }
-  .btn-15:after {
-    position: absolute;
-    content: "";
-    width: 0;
-    height: 100%;
-    top: 0;
-    right: 0;
-    z-index: -1;
-    background-color: #663dff;
-    border-radius: 5px;
-     box-shadow:inset 2px 2px 2px 0px rgba(255,255,255,.5),
-     7px 7px 20px 0px rgba(0,0,0,.1),
-     4px 4px 5px 0px rgba(0,0,0,.1);
-    transition: all 0.3s ease;
-  }
-  .btn-15:hover {
-    color: #fff;
-  }
-  .btn-15:hover:after {
-    left: 0;
-    width: 100%;
-  }
-  .btn-15:active {
-    top: 2px;
-  }
-  button {
-    margin: 20px;
-  }
-  .custom-btn {
-    width: 130px;
-    height: 40px;
-    color: #0037ff;
-    border-radius: 5px;
-    padding: 10px 25px;
-    font-family: 'Lato', sans-serif;
-    font-weight: 500;
-    background: transparent;
-    cursor: pointer;
-    transition: all 0.3s ease;
-    position: relative;
-    display: inline-block;
-     box-shadow:inset 2px 2px 2px 0px rgba(255,255,255,.5),
-     7px 7px 20px 0px rgba(0,0,0,.1),
-     4px 4px 5px 0px rgba(0,0,0,.1);
-    outline: none;
-  }
-  </style>
-    <div>
-        <form action="export" method="post">
-        <button name="export_button" class="custom-btn btn-15">Export</button>
-      </form>
-    </div>'''
-    html_content = codon_button + automation(int(codon_number), codons)
-    #return render_template(str(html_filename))
-    return html_content
 
-@app.route('/export', methods=['POST'])
-def export():
-    codons = session.get('codons', '')
-    number_of_codons = session.get('number_of_codons', 3)
+
+# API route to to analyze codons
+# Input: JSON object with 'codons' and 'number_of_codons' keys
+# Output: JSON object with 'nodes' and 'edges' keys
+@app.route("/codons-list", methods=["POST"])
+def analysis():
+    data = request.json
     
-    csv_content = export_csv(int(number_of_codons),codons)
+    if not data:
+        return jsonify({"error": "No data provided"}), 400
+
+    if "codons" not in data or "numOfCodons" not in data:
+        return jsonify({"error": "No data found"}), 400
+
+    codons = data["codons"]
+    number_of_codons = data["numOfCodons"]
+
+    graph = get_graph(int(number_of_codons), codons)
+
+    return jsonify(graph), 201
+
+
+
+@app.route("/codons-list-alpha-one", methods=["POST"])
+def analysis_alpha_one():
+    data = request.json
     
-    output = io.StringIO()
-    writer = csv.writer(output)
-    writer.writerows(csv_content)
+    if not data:
+        return jsonify({"error": "No data provided"}), 400
+
+    if "codons" not in data or "numOfCodons" not in data:
+        return jsonify({"error": "No data found"}), 400
+
+    codons = data["codons"]
+    number_of_codons = data["numOfCodons"]
+
+    graph = get_graph_alpha_one(int(number_of_codons), codons)
+
+    return jsonify(graph), 201
+
+
+@app.route("/codons-list-alpha-two", methods=["POST"])
+def analysis_alpha_two():
+    data = request.json
     
-    csv_string = output.getvalue()  # CSV formatted string
-    csv_bytes = csv_string.encode('utf-8')  # Convert string to bytes
+    if not data:
+        return jsonify({"error": "No data provided"}), 400
 
-    return Response(
-        csv_bytes,
-        mimetype="text/csv",
-        headers={"Content-Disposition": "attachment; filename=codon_connections.csv"}
-    )
+    if "codons" not in data or "numOfCodons" not in data:
+        return jsonify({"error": "No data found"}), 400
 
+    codons = data["codons"]
+    number_of_codons = data["numOfCodons"]
 
+    graph = get_graph_alpha_two(int(number_of_codons), codons)
 
+    return jsonify(graph), 201
 
-@app.route('/codon_list', methods=['POST'])
-def importing():
-       # Retrieve the uploaded file from the form (make sure the input name is "file")
-    file = request.files.get('file')
-    if not file:
-        return Response("No file uploaded.", status=400)
-
-    try:
-        # Read file content and decode it
-        stream = io.StringIO(file.stream.read().decode("utf-8"))
-        reader = csv.reader(stream)
-        
-        codons_list = []
-        for row in reader:
-            if row:  # Ensure the row is not empty
-                codon = row[0].strip()
-                codons_list.append(codon)
-        
-        if not codons_list:
-            return Response("No codons found in the file.", status=400)
-        
-        
-        # Convert the list of codons to a single string with newline separators
-        codons_str = "\n".join(codons_list)
-        
-        # Optionally, you might want to store this data in the session for further processing
-        session['codons'] = codons_str
-        session['number_of_codons_file'] = request.form['number_of_codons_file']  # or some other value as needed
-        session['codons']
-        html_content = auto_visual(int(session['number_of_codons_file']),session['codons'])
-        return Response(
-        html_content,
-        mimetype="text/html",
-        headers={"Content-Disposition": "inline; filename=codon_list.html"}
-    )
-
+@app.route("/eigenschaften", methods=["POST"])
+def propertiesApp():
+    data = request.json
     
-    except Exception as e:
-        return Response(f"Error processing file: {e}", status=500)
+    if not data:
+        return jsonify({"error": "No data provided"}), 400
 
+    if "codons" not in data or "numOfCodons" not in data: 
+        return jsonify({"error": "No data found"}), 400
+
+    codons = data["codons"]
+    number_of_codons = data["numOfCodons"]
+
+    properties_input = properties(int(number_of_codons), codons)
+    print("FUUUUUUUUUUUUUUUUUUUUUU",properties_input)
+    return jsonify(properties_input), 201
+
+@app.route("/eigenschaften-alpha-one", methods=["POST"])
+def properties_alpha_one_api():
+    data = request.json
+    
+    if not data:
+        return jsonify({"error": "No data provided"}), 400
+
+    if "codons" not in data or "numOfCodons" not in data:
+        return jsonify({"error": "No data found"}), 400
+
+    codons = data["codons"]
+    number_of_codons = data["numOfCodons"]
+
+    properties_one = properties_alpha_one(int(number_of_codons), codons)
+    print("ONEEEEEEEEEEEEEEEEE",properties_one)
+    return jsonify(properties_one), 201
+
+@app.route("/eigenschaften-alpha-two", methods=["POST"])
+def properties_alpha_two_api():
+    data = request.json
+    
+    if not data:
+        return jsonify({"error": "No data provided"}), 400
+
+    if "codons" not in data or "numOfCodons" not in data:
+        return jsonify({"error": "No data found"}), 400
+
+    codons = data["codons"]
+    number_of_codons = data["numOfCodons"]
+
+    properties_two = properties_alpha_two(int(number_of_codons), codons)
+    print("TWOOOOOOOOOOOOOOO",properties_two)
+
+    return jsonify(properties_two), 201
+
+@app.route("/eigenschaften-c3", methods=["POST"])
+def c3_api():
+    data = request.json
+    
+    if not data:
+        return jsonify({"error": "No data provided"}), 400
+
+    if "codons" not in data or "numOfCodons" not in data:
+        return jsonify({"error": "No data found"}), 400
+
+    codons = data["codons"]
+    number_of_codons = data["numOfCodons"]
+
+    c3_input = c3(int(number_of_codons),codons)
+
+    return str(c3_input), 201
+
+@app.route("/longest-path", methods=["POST"])
+def longest_path_api():
+    data = request.json
+    
+    if not data:
+        return jsonify({"error": "No data provided"}), 400
+
+    if "codons" not in data or "numOfCodons" not in data:
+        return jsonify({"error": "No data found"}), 400
+
+    codons = data["codons"]
+    number_of_codons = data["numOfCodons"]
+
+    longest_path_input = longest_path(int(number_of_codons),codons)
+
+    return str(longest_path_input), 201
