@@ -1,0 +1,168 @@
+main {
+  width: 100vw;
+}
+
+.error-message,
+.back-link {
+  text-align: center;
+}
+
+.error-message {
+  color: #983a37;
+  font-size: 1.5rem;
+}
+
+.back-link {
+  display: block;
+}
+
+.back-link:hover {
+  text-decoration: underline;
+}
+
+.graphs-wrapper {
+  display: flex;
+  flex-wrap: wrap;
+  height: 100vh;
+  position: relative;
+}
+
+.original-codons {
+  width: 100%;
+  height: 100vh;
+}
+
+.c3-graphs {
+  display: flex;
+  flex-direction: row; /* Display graphs in a row */
+  gap: 1rem;
+  width: 100%;
+  height: 100vh;
+  overflow-x: auto; /* Enable horizontal scrolling if needed */
+  overflow-y: hidden; /* Hide vertical scrollbar */
+}
+
+.c3-graphs-overlay {
+  position: relative;
+  width: 100%;
+  height: 100vh;
+}
+
+.graph-container {
+  flex: 1; /* Each graph takes equal space */
+  min-width: 300px; /* Minimum width for each graph */
+  height: 100%;
+  border: 1px solid #444;
+  border-radius: 6px;
+  padding: 0.5rem;
+  box-sizing: border-box;
+  position: relative;
+}
+
+.graph-container h3 {
+  text-align: center;
+  margin-bottom: 0.5rem;
+  color: #fff;
+}
+
+.overlay-graph {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none; /* Let controls above be clickable */
+}
+
+.overlay-graph > * {
+  width: 100%;
+  height: 100%;
+}
+
+.visibility-controls {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  background: #2c2c2c; /* Darker background to match the theme */
+  padding: 0.6rem; /* Keep compact padding */
+  border: 1px solid #444; /* Subtle border */
+  border-radius: 6px; /* Rounded corners */
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.3); /* Softer shadow */
+  z-index: 10;
+  font-size: 0.9rem; /* Keep font size */
+  color: #f0f0f0; /* Light text color for contrast */
+  display: flex;
+  flex-direction: column;
+  gap: 0.3rem; /* Reduce gap between elements */
+}
+
+.visibility-controls h3 {
+  margin-bottom: 0.2rem; /* Reduce margin below the heading */
+  font-size: 1rem; /* Keep heading size */
+  color: #ffffff; /* Bright white for headings */
+}
+
+.visibility-controls label {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 0.5rem; /* Reduce gap between label text and slider */
+  color: #dcdcdc; /* Softer text color for labels */
+}
+
+.visibility-controls input[type="range"] {
+  flex: 1;
+  appearance: none;
+  height: 5px; /* Keep slider height */
+  background: #444; /* Darker slider background */
+  border-radius: 2px;
+  outline: none;
+  transition: background 0.3s;
+}
+
+.visibility-controls input[type="range"]::-webkit-slider-thumb {
+  appearance: none;
+  width: 16px; /* Keep thumb size */
+  height: 16px; /* Keep thumb size */
+  border-radius: 50%;
+  background: #90c67c; /* Green thumb to match the theme */
+  cursor: pointer;
+  transition: background 0.3s;
+}
+
+.visibility-controls input[type="range"]::-webkit-slider-thumb:hover {
+  background: #76a864; /* Slightly darker green on hover */
+}
+
+.visibility-controls input[type="range"]::-moz-range-thumb {
+  width: 16px; /* Keep thumb size */
+  height: 16px; /* Keep thumb size */
+  border-radius: 50%;
+  background: #90c67c;
+  cursor: pointer;
+  transition: background 0.3s;
+}
+
+.visibility-controls input[type="range"]::-moz-range-thumb:hover {
+  background: #76a864;
+}
+
+.export-button {
+  position: fixed; /* Change to fixed to ensure it stays visible */
+  top: 10px;
+  left: 10px;
+  background-color: #4caf50;
+  color: white;
+  border: none;
+  padding: 0.5rem 1rem;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 1rem;
+  z-index: 1000; /* Ensure it appears above other elements */
+}
+
+.export-button:hover {
+  background-color: #45a049;
+}
