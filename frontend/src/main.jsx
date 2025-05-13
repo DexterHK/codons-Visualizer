@@ -6,14 +6,14 @@ import App from "./routes/prototype.jsx";
 import * as ReactDOMClient from "react-dom/client";
 
 import Home from "./routes/home.jsx";
-import Codons from "./routes/codons-graph.jsx";
+import CodonsGraph from "./routes/codons-graph.jsx";
 
 createRoot(document.getElementById("root")).render(
   <StrictMode>
     <BrowserRouter>
       <Routes>
         <Route index element={<Home />} />
-        <Route path="codons" element={<Codons />} />
+        <Route path="codons" element={<CodonsGraph />} />
       </Routes>
     </BrowserRouter>
   </StrictMode>,

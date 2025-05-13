@@ -28,112 +28,31 @@ export default function Home() {
     e.preventDefault();
 
     startTransition(async () => {
-      const originalResponse = await fetch(
-        "http://139.59.213.46:5000/codons-list",
-        {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
+      try {
+        const originalResponse = await fetch(
+          "http://139.59.213.46:5000/codons-list", // Ensure this matches the backend's global URL
+          {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify({ codons, numOfCodons }),
           },
-          body: JSON.stringify({ codons, numOfCodons }),
-        },
-      );
+        );
 
-      const alphaOneResponse = await fetch(
-        "http://139.59.213.46:5000/codons-list-alpha-one",
-        {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify({ codons, numOfCodons }),
-        },
-      );
+        if (!originalResponse.ok) {
+          throw new Error("Failed to fetch data from the backend.");
+        }
 
-      const alphaTwoResponse = await fetch(
-        "http://139.59.213.46:5000/codons-list-alpha-two",
-        {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify({ codons, numOfCodons }),
-        },
-      );
+        const originalData = await originalResponse.json();
+        setOriginalCodons(originalData);
 
-      const eigenschaftenResponse = await fetch(
-        "http://139.59.213.46:5000/eigenschaften",
-        {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify({ codons, numOfCodons }),
-        },
-      );
-      
-      const eigenschaftenAlphaOneResponse = await fetch(
-        "http://139.59.213.46:5000/eigenschaften-alpha-one",
-        {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify({ codons, numOfCodons }),
-        },
-      );
-
-      const eigenschaftenAlphaTwoResponse = await fetch(
-        "http://139.59.213.46:5000/eigenschaften-alpha-two",
-        {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify({ codons, numOfCodons }),
-        },
-      );
-
-      const c3Response = await fetch(
-        "http://139.59.213.46:5000/eigenschaften-c3",
-        {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify({ codons, numOfCodons }),
-        },
-      );
-
-      if (
-        originalResponse.status !== 201 ||
-        alphaOneResponse.status !== 201 ||
-        alphaTwoResponse.status !== 201 ||
-        c3Response.status !== 201
-      ) {
-        setError(originalResponse.statusText);
-        return;
+        // Navigate to the /codons route after successful submission
+        navigate("/codons");
+      } catch (error) {
+        console.error("Error during form submission:", error);
+        setError("Failed to connect to the backend. Please try again.");
       }
-
-      const originalData = await originalResponse.json();
-      const alphaOneData = await alphaOneResponse.json();
-      const alphaTwoData = await alphaTwoResponse.json();
-      const eigenschaftenData = await eigenschaftenResponse.json();
-      const eigenschaftenAlphaOneData = await eigenschaftenAlphaOneResponse.json();
-      const eigenschaftenAlphaTwoData = await eigenschaftenAlphaTwoResponse.json();
-      const c3Data = await c3Response.text(); // C3 response is a string (True/False)
-
-      setOriginalCodons(originalData);
-      setAlphaOne(alphaOneData);
-      setAlphaTwo(alphaTwoData);
-      setEigenschaften(eigenschaftenData);
-      setEigenschaftenAlphaOne(eigenschaftenAlphaOneData)
-      setEigenschaftenAlphaTwo(eigenschaftenAlphaTwoData)
-      setC3(c3Data === "True"); // Update C3 in the store
-
-      navigate({
-        pathname: "/codons",
-      });
     });
   };
 
