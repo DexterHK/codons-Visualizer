@@ -29,7 +29,7 @@ export default function Home() {
 
     startTransition(async () => {
       const originalResponse = await fetch(
-        "http://localhost:5000/codons-list",
+        "http://139.59.213.46:5000/codons-list",
         {
           method: "POST",
           headers: {
@@ -40,7 +40,7 @@ export default function Home() {
       );
 
       const alphaOneResponse = await fetch(
-        "http://localhost:5000/codons-list-alpha-one",
+        "http://139.59.213.46:5000/codons-list-alpha-one",
         {
           method: "POST",
           headers: {
@@ -51,7 +51,7 @@ export default function Home() {
       );
 
       const alphaTwoResponse = await fetch(
-        "http://localhost:5000/codons-list-alpha-two",
+        "http://139.59.213.46:5000/codons-list-alpha-two",
         {
           method: "POST",
           headers: {
@@ -62,7 +62,7 @@ export default function Home() {
       );
 
       const eigenschaftenResponse = await fetch(
-        "http://localhost:5000/eigenschaften",
+        "http://139.59.213.46:5000/eigenschaften",
         {
           method: "POST",
           headers: {
@@ -73,7 +73,7 @@ export default function Home() {
       );
       
       const eigenschaftenAlphaOneResponse = await fetch(
-        "http://localhost:5000/eigenschaften-alpha-one",
+        "http://139.59.213.46:5000/eigenschaften-alpha-one",
         {
           method: "POST",
           headers: {
@@ -84,7 +84,7 @@ export default function Home() {
       );
 
       const eigenschaftenAlphaTwoResponse = await fetch(
-        "http://localhost:5000/eigenschaften-alpha-two",
+        "http://139.59.213.46:5000/eigenschaften-alpha-two",
         {
           method: "POST",
           headers: {
@@ -95,7 +95,7 @@ export default function Home() {
       );
 
       const c3Response = await fetch(
-        "http://localhost:5000/eigenschaften-c3",
+        "http://139.59.213.46:5000/eigenschaften-c3",
         {
           method: "POST",
           headers: {

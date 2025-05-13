@@ -154,3 +154,6 @@ def longest_path_api():
     longest_path_input = longest_path(int(number_of_codons),codons)
 
     return str(longest_path_input), 201
+
+if __name__ == "__main__":
+    app.run(host="0.0.0.0", port=5000)  # Listen on all interfaces
