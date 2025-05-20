@@ -449,7 +449,7 @@ def get_graph(number_of_codons, codons):
     edges = list(
         filter(lambda x: len(x[0]) > 0 and len(x[1]) > 0, parsed_input["rows"])
     )
-
+    
     return {"nodes": nodes, "edges": edges}
 
 
@@ -463,30 +463,26 @@ def get_graph_alpha_two(number_of_codons, codons):
     return get_graph(number_of_codons, alpha_two_codons)
 
 
-def longest_path(number,edge_list):
+def longest_path(number, edge_list):
     """Return one longest simple path in a directed graph."""
-    edge_list = last_parse(number,edge_list)
-    edge_list = edge_list['rows']
-    graph = defaultdict(list)
-    for u, v in edge_list:
-        graph[u].append(v)
-
-    best = []                      # longest path found so far
-
-    def dfs(node, visited, path):
-        nonlocal best
-        visited.add(node)
-        path.append(node)
-        if len(path) > len(best):   # record if better
-            best = path.copy()
-
-        for nxt in graph.get(node, []):   # .get avoids changing the dict
-            if nxt not in visited:        # simple path: no repeats
-                dfs(nxt, visited, path)
-
-        path.pop()
-        visited.remove(node)
-
-    for start in list(graph):      # freeze keys so size can't change
-        dfs(start, set(), [])
-    return best
+    # Create a set of nodes from the edge list
+    nodes = set()
+    for edge in edge_list:
+        nodes.add(edge[0])
+        nodes.add(edge[1])
+    nodes = list(nodes)
+    edges = edge_list  # Use edge_list directly
+    longest_path = []
+    longest_length = 0
+    for start_node in nodes:
+        stack = [(start_node, [start_node])]
+        while stack:
+            current_node, path = stack.pop()
+            for neighbor in [x[1] for x in edges if x[0] == current_node]:
+                if neighbor not in path:
+                    new_path = path + [neighbor]
+                    stack.append((neighbor, new_path))
+                    if len(new_path) > longest_length:
+                        longest_length = len(new_path)
+                        longest_path = new_path
+    return longest_path

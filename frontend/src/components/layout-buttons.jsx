@@ -4,7 +4,7 @@ import "../css/layout-buttons.css";
 import ForceDirected from "./icons/force-directed";
 import Circular from "./icons/circular";
 
-export default function LayoutButtons({ setLayout, layout }) {
+export default function LayoutButtons({ setLayout, layout, toggleLongestPath }) {
   return (
     <div className="layout-buttons">
       <button
@@ -23,6 +23,13 @@ export default function LayoutButtons({ setLayout, layout }) {
       >
         <span>Force Directed</span>
         <ForceDirected />
+      </button>
+      <button
+        type="button"
+        className={`longestPath ${layout === "longestPath" && "active"}`}
+        onClick={toggleLongestPath}
+      >
+        <span>Longest Path</span>
       </button>
     </div>
   );

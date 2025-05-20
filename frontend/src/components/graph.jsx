@@ -2,10 +2,10 @@ import React from "react";
 import { useRef } from "react";
 import { darkTheme, GraphCanvas, useSelection } from "reagraph";
 
-export default function Graph({ nodes, edges , layout  }) {
+export default function Graph({ nodes, edges, layout, selections: externalSelections }) {
   const graphRef = useRef(null);
   const {
-    selections,
+    selections: localSelections,
     actives,
     onNodeClick,
     onCanvasClick,
@@ -14,13 +14,13 @@ export default function Graph({ nodes, edges , layout  }) {
   } = useSelection({
     ref: graphRef,
     pathSelectionType: "out",
+    defaultSelection: externalSelections,
   });
   return (
     <GraphCanvas
-      ref={graphRef}
-      nodes={nodes}
+      ref={graphRef}      nodes={nodes}
       edges={edges}
-      selections={selections}
+      selections={externalSelections || localSelections}
       actives={actives}
       onNodeClick={onNodeClick}
       onCanvasClick={onCanvasClick}

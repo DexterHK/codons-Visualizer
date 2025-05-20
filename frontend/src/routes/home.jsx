@@ -19,7 +19,6 @@ export default function Home() {
   const setEigenschaftenAlphaTwo = useStore((state) => state.setEigenschaftenAlphaTwo);
   const setC3 = useStore((state) => state.setC3);
 
-
   const [isPending, startTransition] = useTransition();
 
   const navigate = useNavigate();
@@ -127,8 +126,8 @@ export default function Home() {
       setAlphaOne(alphaOneData);
       setAlphaTwo(alphaTwoData);
       setEigenschaften(eigenschaftenData);
-      setEigenschaftenAlphaOne(eigenschaftenAlphaOneData)
-      setEigenschaftenAlphaTwo(eigenschaftenAlphaTwoData)
+      setEigenschaftenAlphaOne(eigenschaftenAlphaOneData);
+      setEigenschaftenAlphaTwo(eigenschaftenAlphaTwoData);
       setC3(c3Data === "True"); // Update C3 in the store
 
       navigate({

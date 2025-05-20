@@ -139,18 +139,26 @@ def c3_api():
     return str(c3_input), 201
 
 @app.route("/longest-path", methods=["POST"])
+@cross_origin()
 def longest_path_api():
-    data = request.json
-    
-    if not data:
-        return jsonify({"error": "No data provided"}), 400
+    try:
+        data = request.json
+        print("Received data:", data)  # Debug print
+        
+        if not data:
+            return jsonify({"error": "No data provided"}), 400
 
-    if "codons" not in data or "numOfCodons" not in data:
-        return jsonify({"error": "No data found"}), 400
+        if "codons" not in data or "numOfCodons" not in data:
+            return jsonify({"error": "No data found"}), 400
 
-    codons = data["codons"]
-    number_of_codons = data["numOfCodons"]
-
-    longest_path_input = longest_path(int(number_of_codons),codons)
-
-    return str(longest_path_input), 201
+        edges = data["codons"]  # This should be the direct edges array
+        num_nodes = int(data["numOfCodons"])
+        print("Processing with edges:", edges)  # Debug print
+        
+        longest_path_input = longest_path(num_nodes, edges)
+        print("Longest path input:", longest_path_input)  # Debug print
+        
+        return jsonify(longest_path_input), 200
+    except Exception as e:
+        print("Error in longest_path_api:", str(e))  # Debug print
+        return jsonify({"error": str(e)}), 500

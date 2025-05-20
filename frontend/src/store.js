@@ -9,6 +9,7 @@ export const useStore = create((set) => ({
   eigenschaften: {},
   error: "",
   c3: false, // Add c3 to the store
+  longestPath: {},
   setCodons: (codons) => set({ codons }),
   setNumOfCodons: (numOfCodons) => set({ numOfCodons }),
   setOriginalCodons: (originalCodons) => set({ originalCodons }),
@@ -18,7 +19,7 @@ export const useStore = create((set) => ({
   setEigenschaftenAlphaOne: (eigenschaftenAlphaOne) => set({ eigenschaftenAlphaOne }),
   setEigenschaftenAlphaTwo: (eigenschaftenAlphaTwo) => set({ eigenschaftenAlphaTwo }),
   setC3: (c3) => set({ c3 }),
-
+  setLongestPath: (longestPath) => set({ longestPath }),
   
   setError: (error) => set({ error }),
 }));
