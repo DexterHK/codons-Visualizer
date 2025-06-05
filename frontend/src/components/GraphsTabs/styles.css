@@ -1,0 +1,106 @@
+.tabs {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background: transparent;
+  padding: 0;
+  margin: 0;
+}
+
+.tabs ul {
+  margin: 0;
+  list-style: none;
+  display: flex;
+  gap: 0.75rem;
+  padding: 0;
+  background: linear-gradient(135deg, var(--bg-tertiary), var(--bg-quaternary));
+  border: 2px solid var(--border-secondary);
+  border-radius: 12px;
+  padding: 0.75rem;
+  box-shadow: 0 4px 16px var(--shadow-primary);
+}
+
+.tabs ul li {
+  transition: transform 0.2s ease;
+}
+
+.tabs ul li:hover {
+  transform: translateY(-2px);
+}
+
+.tabs ul li button {
+  padding: 0.75rem 1.5rem;
+  background: linear-gradient(135deg, var(--bg-quaternary), var(--border-secondary));
+  color: var(--text-primary);
+  border: 2px solid var(--border-secondary);
+  border-radius: 8px;
+  cursor: pointer;
+  font-size: 0.95rem;
+  font-weight: 600;
+  transition: all 0.3s ease;
+  box-shadow: 0 2px 8px var(--shadow-primary);
+  white-space: nowrap;
+}
+
+.tabs ul li button:hover {
+  background: linear-gradient(135deg, var(--border-secondary), var(--border-tertiary));
+  border-color: var(--border-tertiary);
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px var(--shadow-primary);
+}
+
+.tabs ul li.active button {
+  background: linear-gradient(135deg, var(--accent-primary), var(--accent-secondary));
+  border-color: var(--accent-primary);
+  color: white;
+  box-shadow: 0 4px 16px rgba(100, 108, 255, 0.4);
+}
+
+.tabs ul li.active button:hover {
+  background: linear-gradient(135deg, var(--accent-secondary), #4c4bef);
+  border-color: var(--accent-secondary);
+}
+
+/* Responsive Design */
+@media (max-width: 900px) {
+  .tabs ul {
+    gap: 0.5rem;
+    padding: 0.5rem;
+    flex-wrap: wrap;
+    justify-content: center;
+  }
+  
+  .tabs ul li button {
+    padding: 0.5rem 1rem;
+    font-size: 0.85rem;
+  }
+}
+
+@media (max-width: 600px) {
+  .tabs ul {
+    gap: 0.4rem;
+    padding: 0.4rem;
+  }
+  
+  .tabs ul li button {
+    padding: 0.4rem 0.8rem;
+    font-size: 0.8rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .tabs ul {
+    flex-direction: column;
+    width: 100%;
+    max-width: 300px;
+  }
+  
+  .tabs ul li {
+    width: 100%;
+  }
+  
+  .tabs ul li button {
+    width: 100%;
+    text-align: center;
+  }
+}

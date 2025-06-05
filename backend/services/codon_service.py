@@ -1,0 +1,58 @@
+"""
+Service for handling codon-related operations.
+"""
+from utils.codon_utils import (
+    remove_spaces, remove_backslashes, parseinput, get_complement, 
+    complement, is_self_complementary, is_maximal_self_complementary,
+    word_length, is_comma_free, is_duplicate_free, shift_string,
+    alph1, alph2, alph3
+)
+
+class CodonService:
+    """Service class for codon operations."""
+    
+    def __init__(self):
+        pass
+    
+    def process_codon_input(self, codon_length: int, codons: str) -> list:
+        """Process and parse codon input."""
+        return parseinput(codon_length, codons)
+    
+    def get_codon_complement(self, sequence: str) -> str:
+        """Get complement of a codon sequence."""
+        return complement(sequence)
+    
+    def check_self_complementary(self, codons) -> bool:
+        """Check if codons are self-complementary."""
+        return is_self_complementary(codons)
+    
+    def check_maximal_self_complementary(self, codons) -> bool:
+        """Check if codons are maximal self-complementary."""
+        return is_maximal_self_complementary(codons)
+    
+    def get_word_length(self, code):
+        """Get word length of code."""
+        return word_length(code)
+    
+    def check_comma_free(self, code) -> bool:
+        """Check if code is comma-free."""
+        return is_comma_free(code)
+    
+    def check_duplicate_free(self, code) -> bool:
+        """Check if code is duplicate-free."""
+        return is_duplicate_free(code)
+    
+    def apply_alpha_transformation(self, sequence: str, alpha_type: int) -> str:
+        """Apply alpha transformation to sequence."""
+        if alpha_type == 1:
+            return alph1(sequence)
+        elif alpha_type == 2:
+            return alph2(sequence)
+        elif alpha_type == 3:
+            return alph3(sequence)
+        else:
+            raise ValueError("Invalid alpha type. Must be 1, 2, or 3.")
+    
+    def shift_sequence(self, sequence: str, shift: int) -> str:
+        """Shift sequence by given amount."""
+        return shift_string(sequence, shift)

@@ -1,0 +1,130 @@
+.layout-buttons {
+  display: flex;
+  gap: 0.75rem;
+  background: linear-gradient(135deg, var(--bg-tertiary), var(--bg-quaternary));
+  border: 2px solid var(--border-secondary);
+  border-radius: 12px;
+  padding: 0.75rem;
+  box-shadow: 0 4px 16px var(--shadow-primary);
+  align-items: center;
+  justify-content: center;
+}
+
+.layout-buttons button {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 0.75rem 1.25rem;
+  background: linear-gradient(135deg, var(--bg-quaternary), var(--border-secondary));
+  color: var(--text-primary);
+  border: 2px solid var(--border-secondary);
+  border-radius: 8px;
+  cursor: pointer;
+  font-size: 0.95rem;
+  font-weight: 600;
+  transition: all 0.3s ease;
+  box-shadow: 0 2px 8px var(--shadow-primary);
+  white-space: nowrap;
+  min-width: 120px;
+}
+
+.layout-buttons button:hover {
+  background: linear-gradient(135deg, var(--border-secondary), var(--border-tertiary));
+  border-color: var(--border-tertiary);
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px var(--shadow-primary);
+}
+
+.layout-buttons button.active {
+  background: linear-gradient(135deg, var(--accent-primary), var(--accent-secondary));
+  border-color: var(--accent-primary);
+  color: white;
+  box-shadow: 0 4px 16px rgba(100, 108, 255, 0.4);
+}
+
+.layout-buttons button.active:hover {
+  background: linear-gradient(135deg, var(--accent-secondary), #4c4bef);
+  border-color: var(--accent-secondary);
+}
+
+.layout-buttons button span {
+  font-weight: 600;
+}
+
+.layout-buttons button svg {
+  width: 20px;
+  height: 20px;
+  flex-shrink: 0;
+}
+
+/* Responsive Design */
+@media (max-width: 900px) {
+  .layout-buttons {
+    gap: 0.5rem;
+    padding: 0.5rem;
+    flex-wrap: wrap;
+  }
+  
+  .layout-buttons button {
+    padding: 0.5rem 1rem;
+    font-size: 0.85rem;
+    min-width: 100px;
+    gap: 0.5rem;
+  }
+  
+  .layout-buttons button svg {
+    width: 18px;
+    height: 18px;
+  }
+}
+
+@media (max-width: 600px) {
+  .layout-buttons {
+    gap: 0.4rem;
+    padding: 0.4rem;
+  }
+  
+  .layout-buttons button {
+    padding: 0.4rem 0.8rem;
+    font-size: 0.8rem;
+    min-width: 90px;
+    gap: 0.4rem;
+  }
+  
+  .layout-buttons button svg {
+    width: 16px;
+    height: 16px;
+  }
+}
+
+@media (max-width: 480px) {
+  .layout-buttons {
+    flex-direction: column;
+    width: 100%;
+    max-width: 300px;
+  }
+  
+  .layout-buttons button {
+    width: 100%;
+    min-width: auto;
+    justify-content: center;
+  }
+}
+
+/* Special styling for longest path button */
+.layout-buttons button.longestPath {
+  background: linear-gradient(135deg, #ff6b35, #f7931e);
+  border-color: #ff6b35;
+}
+
+.layout-buttons button.longestPath:hover {
+  background: linear-gradient(135deg, #f7931e, #e8851e);
+  border-color: #f7931e;
+}
+
+.layout-buttons button.longestPath.active {
+  background: linear-gradient(135deg, #e8851e, #d4761a);
+  border-color: #e8851e;
+  box-shadow: 0 4px 16px rgba(255, 107, 53, 0.4);
+}

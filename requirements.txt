@@ -1,5 +1,0 @@
-pandas
-networkx
-pyvis
-flask
-flask-cors
