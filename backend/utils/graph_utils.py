@@ -3,7 +3,10 @@ Utility functions for graph operations.
 """
 from collections import defaultdict
 from .codon_utils import alph1, alph2, alph3
-from .processing_utils import last_parse
+from .processing_utils import (
+    last_parse, get_component_graph, get_full_representing_graph,
+    process_codons_1_rest, process_codons_2_2, process_codons_rest_1
+)
 
 def all_cycles(edge_list):
     """Find all cycles in a graph."""
@@ -32,7 +35,7 @@ def all_cycles(edge_list):
     return cycles
 
 def get_graph(number_of_codons, codons):
-    """Get the original codon graph."""
+    """Get the original codon graph using processing_utils."""
     parsed_input = last_parse(number_of_codons, codons)
 
     nodes = list(
@@ -44,6 +47,91 @@ def get_graph(number_of_codons, codons):
 
     edges = list(
         filter(lambda x: len(x[0]) > 0 and len(x[1]) > 0, parsed_input["rows"])
+    )
+    
+    return {"nodes": nodes, "edges": edges}
+
+def get_component_graph_direct(codons, component_index):
+    """Get a specific component graph directly using processing_utils."""
+    result = get_component_graph(codons, component_index)
+    
+    nodes = list(
+        filter(
+            lambda y: len(y) > 0,
+            {x[0] for x in result["rows"]} | {x[1] for x in result["rows"]},
+        )
+    )
+
+    edges = list(
+        filter(lambda x: len(x[0]) > 0 and len(x[1]) > 0, result["rows"])
+    )
+    
+    return {"nodes": nodes, "edges": edges}
+
+def get_full_graph_direct(codons):
+    """Get the full representing graph directly using processing_utils."""
+    result = get_full_representing_graph(codons)
+    
+    nodes = list(
+        filter(
+            lambda y: len(y) > 0,
+            {x[0] for x in result["rows"]} | {x[1] for x in result["rows"]},
+        )
+    )
+
+    edges = list(
+        filter(lambda x: len(x[0]) > 0 and len(x[1]) > 0, result["rows"])
+    )
+    
+    return {"nodes": nodes, "edges": edges}
+
+def get_1_rest_graph(codons):
+    """Get 1-rest breakdown graph using processing_utils."""
+    result = process_codons_1_rest(codons)
+    
+    nodes = list(
+        filter(
+            lambda y: len(y) > 0,
+            {x[0] for x in result["rows"]} | {x[1] for x in result["rows"]},
+        )
+    )
+
+    edges = list(
+        filter(lambda x: len(x[0]) > 0 and len(x[1]) > 0, result["rows"])
+    )
+    
+    return {"nodes": nodes, "edges": edges}
+
+def get_2_2_graph(codons):
+    """Get 2-2 breakdown graph using processing_utils."""
+    result = process_codons_2_2(codons)
+    
+    nodes = list(
+        filter(
+            lambda y: len(y) > 0,
+            {x[0] for x in result["rows"]} | {x[1] for x in result["rows"]},
+        )
+    )
+
+    edges = list(
+        filter(lambda x: len(x[0]) > 0 and len(x[1]) > 0, result["rows"])
+    )
+    
+    return {"nodes": nodes, "edges": edges}
+
+def get_rest_1_graph(codons):
+    """Get rest-1 breakdown graph using processing_utils."""
+    result = process_codons_rest_1(codons)
+    
+    nodes = list(
+        filter(
+            lambda y: len(y) > 0,
+            {x[0] for x in result["rows"]} | {x[1] for x in result["rows"]},
+        )
+    )
+
+    edges = list(
+        filter(lambda x: len(x[0]) > 0 and len(x[1]) > 0, result["rows"])
     )
     
     return {"nodes": nodes, "edges": edges}

@@ -1,0 +1,253 @@
+.cytoscape-overlay-container {
+  display: flex;
+  height: 100vh;
+  width: 100%;
+  background: var(--bg-color);
+  color: var(--text-color);
+}
+
+.cytoscape-controls {
+  width: 300px;
+  min-width: 300px;
+  padding: 20px;
+  background: var(--sidebar-bg);
+  border-right: 1px solid var(--border-color);
+  overflow-y: auto;
+  box-shadow: 2px 0 5px rgba(0, 0, 0, 0.1);
+}
+
+.cytoscape-controls h4 {
+  margin: 0 0 15px 0;
+  color: var(--text-color);
+  font-size: 18px;
+  font-weight: 600;
+}
+
+.control-instructions {
+  background: var(--card-bg);
+  padding: 12px;
+  border-radius: 8px;
+  margin-bottom: 20px;
+  border: 1px solid var(--border-color);
+}
+
+.control-instructions p {
+  margin: 5px 0;
+  font-size: 12px;
+  color: var(--text-secondary);
+}
+
+.control-group {
+  margin-bottom: 25px;
+}
+
+.control-group label {
+  display: block;
+  margin-bottom: 15px;
+  font-weight: 500;
+}
+
+.control-group label span {
+  display: block;
+  margin-bottom: 8px;
+  font-size: 14px;
+  font-weight: 600;
+}
+
+.control-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.control-row input[type="range"] {
+  flex: 1;
+  height: 6px;
+  background: var(--slider-bg);
+  border-radius: 3px;
+  outline: none;
+  -webkit-appearance: none;
+}
+
+.control-row input[type="range"]::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 18px;
+  height: 18px;
+  background: var(--primary-color);
+  border-radius: 50%;
+  cursor: pointer;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+}
+
+.control-row input[type="range"]::-moz-range-thumb {
+  width: 18px;
+  height: 18px;
+  background: var(--primary-color);
+  border-radius: 50%;
+  cursor: pointer;
+  border: none;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+}
+
+.bring-front-btn {
+  padding: 6px 12px;
+  background: var(--button-bg);
+  color: var(--button-text);
+  border: 1px solid var(--border-color);
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 12px;
+  white-space: nowrap;
+  transition: all 0.2s ease;
+}
+
+.bring-front-btn:hover {
+  background: var(--button-hover-bg);
+  transform: translateY(-1px);
+}
+
+.preset-buttons {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin-bottom: 25px;
+}
+
+.preset-buttons button {
+  padding: 10px 15px;
+  background: var(--accent-bg);
+  color: var(--accent-text);
+  border: 1px solid var(--accent-border);
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 13px;
+  font-weight: 500;
+  transition: all 0.2s ease;
+}
+
+.preset-buttons button:hover {
+  background: var(--accent-hover-bg);
+  transform: translateY(-1px);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+}
+
+.layout-controls {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.layout-controls button {
+  padding: 10px 15px;
+  background: var(--secondary-bg);
+  color: var(--secondary-text);
+  border: 1px solid var(--secondary-border);
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 13px;
+  font-weight: 500;
+  transition: all 0.2s ease;
+}
+
+.layout-controls button:hover {
+  background: var(--secondary-hover-bg);
+  transform: translateY(-1px);
+}
+
+.cytoscape-graph-container {
+  flex: 1;
+  position: relative;
+  background: var(--graph-bg);
+}
+
+.cytoscape-graph {
+  width: 100%;
+  height: 100%;
+  background: transparent;
+}
+
+/* Dark theme support */
+:root {
+  --bg-color: #ffffff;
+  --text-color: #333333;
+  --text-secondary: #666666;
+  --sidebar-bg: #f8f9fa;
+  --card-bg: #ffffff;
+  --border-color: #e0e0e0;
+  --button-bg: #f0f0f0;
+  --button-text: #333333;
+  --button-hover-bg: #e0e0e0;
+  --slider-bg: #ddd;
+  --primary-color: #007bff;
+  --accent-bg: #e3f2fd;
+  --accent-text: #1976d2;
+  --accent-border: #bbdefb;
+  --accent-hover-bg: #bbdefb;
+  --secondary-bg: #f5f5f5;
+  --secondary-text: #333333;
+  --secondary-border: #cccccc;
+  --secondary-hover-bg: #eeeeee;
+  --graph-bg: #ffffff;
+}
+
+.dark {
+  --bg-color: #1a1a1a;
+  --text-color: #ffffff;
+  --text-secondary: #cccccc;
+  --sidebar-bg: #2d2d2d;
+  --card-bg: #3a3a3a;
+  --border-color: #444444;
+  --button-bg: #404040;
+  --button-text: #ffffff;
+  --button-hover-bg: #505050;
+  --slider-bg: #555;
+  --primary-color: #4dabf7;
+  --accent-bg: #1e3a8a;
+  --accent-text: #93c5fd;
+  --accent-border: #3b82f6;
+  --accent-hover-bg: #1e40af;
+  --secondary-bg: #374151;
+  --secondary-text: #ffffff;
+  --secondary-border: #6b7280;
+  --secondary-hover-bg: #4b5563;
+  --graph-bg: #1a1a1a;
+}
+
+/* Responsive design */
+@media (max-width: 768px) {
+  .cytoscape-overlay-container {
+    flex-direction: column;
+  }
+  
+  .cytoscape-controls {
+    width: 100%;
+    min-width: unset;
+    height: auto;
+    max-height: 40vh;
+    border-right: none;
+    border-bottom: 1px solid var(--border-color);
+  }
+  
+  .cytoscape-graph-container {
+    height: 60vh;
+  }
+}
+
+/* Scrollbar styling */
+.cytoscape-controls::-webkit-scrollbar {
+  width: 6px;
+}
+
+.cytoscape-controls::-webkit-scrollbar-track {
+  background: var(--sidebar-bg);
+}
+
+.cytoscape-controls::-webkit-scrollbar-thumb {
+  background: var(--border-color);
+  border-radius: 3px;
+}
+
+.cytoscape-controls::-webkit-scrollbar-thumb:hover {
+  background: var(--text-secondary);
+}

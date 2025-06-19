@@ -2,7 +2,7 @@
 Service for handling properties-related operations.
 """
 from utils.properties_utils import (
-    properties, properties_alpha_one, properties_alpha_two, 
+    properties, properties_alpha_one, properties_alpha_two, properties_alpha_three,
     c3, is_circular_code
 )
 
@@ -26,13 +26,7 @@ class PropertiesService:
     
     def get_alpha_three_properties(self, number_of_codons: int, codons: list) -> dict:
         """Get properties for alpha-three transformed codons."""
-        # For now, return empty properties since properties_alpha_three might not exist
-        # This can be implemented when the function is available
-        try:
-            from utils.properties_utils import properties_alpha_three
-            return properties_alpha_three(number_of_codons, codons)
-        except ImportError:
-            return {}
+        return properties_alpha_three(number_of_codons, codons)
     
     def get_c3_properties(self, number_of_codons: int, codons: list):
         """Get C3 properties for codons."""

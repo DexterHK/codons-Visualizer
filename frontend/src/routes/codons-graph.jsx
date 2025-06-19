@@ -2,13 +2,16 @@ import React from "react";
 import { useStore } from "../store";
 import Graph from "../components/graph";
 import OverlayGraphs from "../components/OverlayGraphs";
+import CytoscapeOverlay from "../components/CytoscapeOverlay";
 import "../css/codons-graph.css";
 import { Link } from "react-router";
 import { useState, useEffect } from "react";
 import GraphProperties from "../components/GraphProperties";
 import GraphsTabs from "../components/GraphsTabs";
 import LayoutButtons from "../components/LayoutButtons";
+import GraphSortingControls from "../components/GraphSortingControls";
 import ThemeToggle from "../components/icons/theme-toggle";
+import Chevron from "../components/icons/chevron";
 import { saveAs } from "file-saver"; // Add this import for file saving
 
 export default function CodonsGraph() {
@@ -30,6 +33,7 @@ export default function CodonsGraph() {
   const theme = useStore((state) => state.theme);
   const toggleTheme = useStore((state) => state.toggleTheme);
   const [showProperties, setShowProperites] = useState(false);
+  const [showOrganizationControls, setShowOrganizationControls] = useState(false);
   const [activeTab, setActiveTab] = useState(0);
   const numOfCodons = useStore((state) => state.numOfCodons);
   const [layout, setLayout] = useState("circular2d");
@@ -45,6 +49,12 @@ export default function CodonsGraph() {
   const [selections, setSelections] = useState([]); // Add a state for selections
   const [isSeparated, setIsSeparated] = useState(false);
   const [isOverlaid, setIsOverlaid] = useState(false); // New state for overlay mode
+
+  // Graph sorting and optimization states
+  const [nodeSortType, setNodeSortType] = useState('alphabetical');
+  const [enableOptimization, setEnableOptimization] = useState(false);
+  const [isHeaderCollapsed, setIsHeaderCollapsed] = useState(false);
+  const [isFooterCollapsed, setIsFooterCollapsed] = useState(false);
 
   // Apply theme to body element
   useEffect(() => {
@@ -379,16 +389,27 @@ export default function CodonsGraph() {
 
   return (
     <main className="graphs-wrapper">
-      <div className="graphs-header">
-        <div className="header-left-controls">
-          <button className="export-button" onClick={exportGraphToCSV}>
-            Export
-          </button>
-          <button className="theme-toggle-button" onClick={toggleTheme} title={`Switch to ${theme === 'dark' ? 'light' : 'dark'} theme`}>
-            <ThemeToggle isDark={theme === 'dark'} />
-          </button>
-        </div>
-        <GraphsTabs activeTab={activeTab} setActiveTab={setActiveTab} numOfCodons={numOfCodons} />
+      <div className={`graphs-header ${isHeaderCollapsed ? 'collapsed' : ''}`}>
+        {!isHeaderCollapsed && (
+          <>
+            <div className="header-left-controls">
+              <button className="export-button" onClick={exportGraphToCSV}>
+                Export
+              </button>
+              <button className="theme-toggle-button" onClick={toggleTheme} title={`Switch to ${theme === 'dark' ? 'light' : 'dark'} theme`}>
+                <ThemeToggle isDark={theme === 'dark'} />
+              </button>
+            </div>
+            <GraphsTabs activeTab={activeTab} setActiveTab={setActiveTab} numOfCodons={numOfCodons} />
+          </>
+        )}
+        <button 
+          className="header-collapse-toggle"
+          onClick={() => setIsHeaderCollapsed(!isHeaderCollapsed)}
+          title={isHeaderCollapsed ? 'Expand header' : 'Collapse header'}
+        >
+          <Chevron showProperties={!isHeaderCollapsed} />
+        </button>
       </div>
       
       <div className="graphs-content">
@@ -412,6 +433,8 @@ export default function CodonsGraph() {
               ]}
               layout={layout}
               selections={selections}
+              nodeSortType={nodeSortType}
+              enableOptimization={enableOptimization}
             />
           </div>
         )}
@@ -436,6 +459,8 @@ export default function CodonsGraph() {
               ]}
               layout={layout}
               selections={selections}
+              nodeSortType={nodeSortType}
+              enableOptimization={enableOptimization}
             />
           </div>
         )}
@@ -488,6 +513,18 @@ export default function CodonsGraph() {
           </div>
         )}
         
+        {activeTab === (numOfCodons === 2 ? 3 : numOfCodons === 3 ? 4 : 5) && (
+          <div className="cytoscape-overlay-tab">
+            <CytoscapeOverlay 
+              originalCodons={originalCodons}
+              alphaOne={alphaOne}
+              alphaTwo={numOfCodons >= 3 ? alphaTwo : null}
+              alphaThree={numOfCodons === 4 ? alphaThree : null}
+              numOfCodons={numOfCodons}
+            />
+          </div>
+        )}
+
         {activeTab === c3TabIndex && (
           <div className="c3-merged-graph">
             <div className="c3-header">
@@ -715,13 +752,43 @@ export default function CodonsGraph() {
         )}
       </div>
       
-      <div className="graphs-footer">
-        <LayoutButtons
-          toggleLongestPath={toggleLongestPath}
-          setLayout={setLayout}
-          layout={layout}
+      {!isFooterCollapsed && (
+        <div className="graphs-footer">
+          <LayoutButtons
+            toggleLongestPath={toggleLongestPath}
+            setLayout={setLayout}
+            layout={layout}
+          />
+        </div>
+      )}
+      
+      {/* Footer collapse/expand toggle button */}
+      <button
+        type="button"
+        className={`footer-collapse-toggle ${isFooterCollapsed ? 'collapsed' : 'expanded'}`}
+        onClick={() => setIsFooterCollapsed((prev) => !prev)}
+        title={isFooterCollapsed ? 'Show Layout Controls' : 'Hide Layout Controls'}
+      >
+        <Chevron showProperties={!isFooterCollapsed} />
+      </button>
+      
+      <div className={`organization-controls-sidebar ${showOrganizationControls ? 'dropped' : ''}`}>
+        <GraphSortingControls
+          onNodeSortChange={setNodeSortType}
+          onLayoutOptimize={() => setEnableOptimization(!enableOptimization)}
+          nodeSortType={nodeSortType}
+          isOptimized={enableOptimization}
         />
       </div>
+      
+      <button
+        type="button"
+        className="organization-controls-trigger"
+        onClick={() => setShowOrganizationControls((prev) => !prev)}
+      >
+        Organization Controls
+        <Chevron showProperties={showOrganizationControls} />
+      </button>
       
       <GraphProperties
         showProperties={showProperties}

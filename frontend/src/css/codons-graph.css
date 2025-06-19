@@ -83,14 +83,78 @@ main {
 /* Header area for navigation and export */
 .graphs-header {
   grid-area: header;
-  display: flex;
-  justify-content: space-between;
+  display: grid;
+  grid-template-columns: auto 1fr auto;
   align-items: center;
   padding: 1rem 2rem;
   background: linear-gradient(135deg, var(--bg-secondary), var(--bg-tertiary));
   border-bottom: 2px solid var(--border-primary);
   box-shadow: 0 2px 10px var(--shadow-primary);
   z-index: 100;
+  position: relative;
+  transition: all 0.3s ease;
+  overflow: hidden;
+}
+
+.graphs-header > *:nth-child(2) {
+  justify-self: center;
+  margin-left: -3rem; /* Offset to move tabs slightly left */
+}
+
+.graphs-header.collapsed {
+  padding: 0.25rem 1rem;
+  max-height: 40px;
+  display: flex;
+  justify-content: flex-end;
+}
+
+/* Header collapse toggle button */
+.header-collapse-toggle {
+  background: linear-gradient(135deg, var(--bg-quaternary), var(--border-secondary));
+  color: var(--text-primary);
+  border: 2px solid var(--border-secondary);
+  padding: 0.5rem;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  box-shadow: 0 2px 8px var(--shadow-primary);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 110;
+  position: relative;
+}
+
+.graphs-header:not(.collapsed) .header-collapse-toggle {
+  position: absolute;
+  top: 50%;
+  right: 2.5rem;
+  transform: translateY(-50%);
+}
+
+.graphs-header.collapsed .header-collapse-toggle {
+  position: static;
+  transform: none;
+}
+
+.graphs-header:not(.collapsed) .header-collapse-toggle:hover {
+  background: linear-gradient(135deg, var(--border-secondary), var(--border-tertiary));
+  border-color: var(--border-tertiary);
+  transform: translateY(-50%) scale(1.05);
+  box-shadow: 0 4px 12px var(--shadow-secondary);
+}
+
+.graphs-header.collapsed .header-collapse-toggle:hover {
+  background: linear-gradient(135deg, var(--border-secondary), var(--border-tertiary));
+  border-color: var(--border-tertiary);
+  transform: scale(1.05);
+  box-shadow: 0 4px 12px var(--shadow-secondary);
+}
+
+.header-collapse-toggle svg {
+  width: 16px;
+  height: 16px;
+  transition: transform 0.3s ease;
 }
 
 /* Header left controls container */
@@ -98,6 +162,12 @@ main {
   display: flex;
   gap: 0.75rem;
   align-items: center;
+  transition: all 0.3s ease;
+}
+
+/* GraphsTabs component transition */
+.graphs-header > div:not(.header-left-controls):not(.header-collapse-toggle) {
+  transition: all 0.3s ease;
 }
 
 /* Content area for graphs */
@@ -593,6 +663,32 @@ main {
     margin: 1rem;
     min-width: auto;
   }
+  
+  .organization-controls-sidebar {
+    position: relative;
+    right: auto;
+    bottom: auto;
+    width: 100%;
+    max-height: none;
+    margin: 1rem;
+    animation: fadeIn 0.5s ease-out;
+  }
+  
+  .organization-controls-trigger {
+    position: relative;
+    right: auto;
+    bottom: auto;
+    margin: 1rem;
+    min-width: 200px;
+  }
+  
+  .footer-collapse-toggle.expanded {
+    bottom: 5rem;
+  }
+  
+  .footer-collapse-toggle.collapsed {
+    bottom: 1rem;
+  }
 }
 
 @media (max-width: 600px) {
@@ -649,6 +745,32 @@ main {
   .separated-graph {
     min-height: 300px;
   }
+  
+  .organization-controls-trigger {
+    width: calc(100vw - 2rem);
+    left: 1rem;
+    right: 1rem;
+    margin: 0.75rem;
+    min-width: auto;
+  }
+  
+  .footer-collapse-toggle.expanded {
+    bottom: 0.75rem;
+  }
+  
+  .footer-collapse-toggle.collapsed {
+    bottom: 0.75rem;
+  }
+  
+  .footer-collapse-toggle {
+    width: 45px;
+    height: 27px;
+  }
+  
+  .footer-collapse-toggle svg {
+    width: 14px;
+    height: 14px;
+  }
 }
 
 /* Animation and transitions */
@@ -667,26 +789,158 @@ main {
   }
 }
 
+/* Organization Controls Sidebar */
+.organization-controls-sidebar {
+  position: fixed;
+  right: 1.5rem;
+  bottom: 6rem;
+  z-index: 80;
+  width: 320px;
+  max-height: 60vh;
+  overflow-y: auto;
+  opacity: 0;
+  visibility: hidden;
+  transform: translateX(100%);
+  transition: all 0.3s ease;
+}
+
+.organization-controls-sidebar.dropped {
+  opacity: 1;
+  visibility: visible;
+  transform: translateX(0);
+}
+
+/* Organization Controls Trigger Button */
+.organization-controls-trigger {
+  position: fixed;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  background: linear-gradient(135deg, var(--bg-tertiary), var(--bg-quaternary));
+  border: 2px solid var(--border-secondary);
+  border-radius: 12px;
+  padding: 0.75rem 1rem;
+  margin: 1.5rem;
+  right: 0;
+  bottom: 0;
+  z-index: 150;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  box-shadow: 0 4px 16px var(--shadow-primary);
+  color: var(--text-primary);
+  font-weight: 600;
+  min-width: 220px;
+}
+
+.organization-controls-trigger:hover {
+  background: linear-gradient(135deg, var(--bg-quaternary), var(--border-secondary));
+  border-color: var(--border-tertiary);
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px var(--shadow-secondary);
+}
+
+.organization-controls-trigger span {
+  font-size: 1rem;
+  font-weight: 600;
+}
+
+.organization-controls-trigger svg {
+  width: 20px;
+  height: 20px;
+  transition: transform 0.3s ease;
+}
+
+.organization-controls-trigger.active svg {
+  transform: rotate(180deg);
+}
+
+/* Footer collapse toggle button */
+.footer-collapse-toggle {
+  position: fixed;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: linear-gradient(135deg, var(--bg-tertiary), var(--bg-quaternary));
+  border: 2px solid var(--border-secondary);
+  border-radius: 8px;
+  width: 50px;
+  height: 30px;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 300;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  box-shadow: 0 4px 16px var(--shadow-primary);
+  color: var(--text-primary);
+  clip-path: polygon(0% 0%, 75% 0%, 100% 50%, 75% 100%, 0% 100%);
+}
+
+/* When footer is expanded - position higher to avoid overlap */
+.footer-collapse-toggle.expanded {
+  bottom: 6rem;
+}
+
+/* When footer is collapsed - position lower for easier access */
+.footer-collapse-toggle.collapsed {
+  bottom: 1.5rem;
+}
+
+.footer-collapse-toggle:hover {
+  background: linear-gradient(135deg, var(--bg-quaternary), var(--border-secondary));
+  border-color: var(--border-tertiary);
+  transform: translateX(-50%) translateY(-2px);
+  box-shadow: 0 6px 20px var(--shadow-secondary);
+}
+
+.footer-collapse-toggle svg {
+  width: 16px;
+  height: 16px;
+  transition: transform 0.3s ease;
+}
+
+@keyframes slideInFromRight {
+  from {
+    opacity: 0;
+    transform: translateX(100%);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
 /* Scrollbar styling */
 .separated-graphs-container::-webkit-scrollbar,
-.graph-legend-sidebar::-webkit-scrollbar {
+.graph-legend-sidebar::-webkit-scrollbar,
+.organization-controls-sidebar::-webkit-scrollbar {
   width: 8px;
 }
 
 .separated-graphs-container::-webkit-scrollbar-track,
-.graph-legend-sidebar::-webkit-scrollbar-track {
+.graph-legend-sidebar::-webkit-scrollbar-track,
+.organization-controls-sidebar::-webkit-scrollbar-track {
   background: var(--bg-secondary);
   border-radius: 4px;
 }
 
 .separated-graphs-container::-webkit-scrollbar-thumb,
-.graph-legend-sidebar::-webkit-scrollbar-thumb {
+.graph-legend-sidebar::-webkit-scrollbar-thumb,
+.organization-controls-sidebar::-webkit-scrollbar-thumb {
   background: var(--border-secondary);
   border-radius: 4px;
   transition: background 0.3s ease;
 }
 
 .separated-graphs-container::-webkit-scrollbar-thumb:hover,
-.graph-legend-sidebar::-webkit-scrollbar-thumb:hover {
+.graph-legend-sidebar::-webkit-scrollbar-thumb:hover,
+.organization-controls-sidebar::-webkit-scrollbar-thumb:hover {
   background: var(--border-tertiary);
+}
+
+/* Cytoscape overlay tab styling */
+.cytoscape-overlay-tab {
+  width: 100%;
+  height: 100%;
+  position: relative;
+  background-color: var(--bg-primary);
 }

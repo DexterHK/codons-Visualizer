@@ -7,6 +7,10 @@ from utils.codon_utils import (
     word_length, is_comma_free, is_duplicate_free, shift_string,
     alph1, alph2, alph3
 )
+from utils.processing_utils import (
+    get_component_graph, get_full_representing_graph, process_codons_1_rest,
+    process_codons_2_2, process_codons_rest_1, merge_rows, last_parse
+)
 
 class CodonService:
     """Service class for codon operations."""
@@ -56,3 +60,31 @@ class CodonService:
     def shift_sequence(self, sequence: str, shift: int) -> str:
         """Shift sequence by given amount."""
         return shift_string(sequence, shift)
+    
+    def get_component_breakdown(self, codons: list, component_index: int) -> dict:
+        """Get component graph breakdown using processing_utils."""
+        return get_component_graph(codons, component_index)
+    
+    def get_full_graph_breakdown(self, codons: list) -> dict:
+        """Get full representing graph breakdown using processing_utils."""
+        return get_full_representing_graph(codons)
+    
+    def get_1_rest_breakdown(self, codons: list) -> dict:
+        """Get 1-rest breakdown using processing_utils."""
+        return process_codons_1_rest(codons)
+    
+    def get_2_2_breakdown(self, codons: list) -> dict:
+        """Get 2-2 breakdown using processing_utils."""
+        return process_codons_2_2(codons)
+    
+    def get_rest_1_breakdown(self, codons: list) -> dict:
+        """Get rest-1 breakdown using processing_utils."""
+        return process_codons_rest_1(codons)
+    
+    def merge_codon_rows(self, dict1: dict, dict2: dict) -> dict:
+        """Merge two dictionaries containing codon rows using processing_utils."""
+        return merge_rows(dict1, dict2)
+    
+    def get_complete_breakdown(self, number_of_codons: int, codons: str) -> dict:
+        """Get complete codon breakdown using processing_utils last_parse."""
+        return last_parse(number_of_codons, codons)

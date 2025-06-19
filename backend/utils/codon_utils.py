@@ -70,14 +70,88 @@ def shift_string(s: str, shift: int) -> str:
     effective_shift = shift % len(s)
     return s[-effective_shift:] + s[:-effective_shift]
 
-def alph1(s: str) -> str:
-    """Apply alpha-1 transformation."""
-    return shift_string(s, 1)
+def alph1(codons_string: str, codon_length: int = None) -> str:
+    """Apply alpha-1 transformation (left shift by 1) to each codon in the string."""
+    # Remove spaces and newlines first
+    clean_string = remove_spaces(remove_backslashes(codons_string))
+    
+    # If codon_length not provided, try to determine from string length
+    if codon_length is None:
+        if len(clean_string) % 2 == 0:
+            codon_length = 2
+        elif len(clean_string) % 3 == 0:
+            codon_length = 3
+        elif len(clean_string) % 4 == 0:
+            codon_length = 4
+        else:
+            codon_length = 3  # Default fallback
+    
+    result = ""
+    for i in range(0, len(clean_string), codon_length):
+        codon = clean_string[i:i + codon_length]
+        if len(codon) == codon_length:
+            # Left shift by 1: first character goes to end
+            shifted_codon = codon[1:] + codon[0]
+            result += shifted_codon
+        else:
+            result += codon  # If incomplete codon, keep as is
+    
+    return result
 
-def alph2(s: str) -> str:
-    """Apply alpha-2 transformation."""
-    return shift_string(s, -1)
+def alph2(codons_string: str, codon_length: int = None) -> str:
+    """Apply alpha-2 transformation (left shift by 2) to each codon in the string."""
+    # Remove spaces and newlines first
+    clean_string = remove_spaces(remove_backslashes(codons_string))
+    
+    # If codon_length not provided, try to determine from string length
+    if codon_length is None:
+        if len(clean_string) % 2 == 0:
+            codon_length = 2
+        elif len(clean_string) % 3 == 0:
+            codon_length = 3
+        elif len(clean_string) % 4 == 0:
+            codon_length = 4
+        else:
+            codon_length = 3  # Default fallback
+    
+    result = ""
+    for i in range(0, len(clean_string), codon_length):
+        codon = clean_string[i:i + codon_length]
+        if len(codon) == codon_length:
+            # Left shift by 2: first two characters go to end
+            shift_amount = 2 % codon_length  # Handle cases where codon_length < 2
+            shifted_codon = codon[shift_amount:] + codon[:shift_amount]
+            result += shifted_codon
+        else:
+            result += codon  # If incomplete codon, keep as is
+    
+    return result
 
-def alph3(s: str) -> str:
-    """Apply alpha-3 transformation."""
-    return shift_string(s, -2)
+def alph3(codons_string: str, codon_length: int = None) -> str:
+    """Apply alpha-3 transformation (left shift by 3) to each codon in the string."""
+    # Remove spaces and newlines first
+    clean_string = remove_spaces(remove_backslashes(codons_string))
+    
+    # If codon_length not provided, try to determine from string length
+    if codon_length is None:
+        if len(clean_string) % 4 == 0:
+            codon_length = 4
+        else:
+            # If not divisible by 4, return original string
+            return codons_string
+    
+    # Alpha-3 is typically only meaningful for length 4 codons
+    if codon_length != 4:
+        return codons_string
+    
+    result = ""
+    for i in range(0, len(clean_string), codon_length):
+        codon = clean_string[i:i + codon_length]
+        if len(codon) == codon_length:
+            # Left shift by 3: first three characters go to end
+            shifted_codon = codon[3:] + codon[:3]
+            result += shifted_codon
+        else:
+            result += codon  # If incomplete codon, keep as is
+    
+    return result

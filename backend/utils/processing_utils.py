@@ -3,155 +3,117 @@ Utility functions for processing operations.
 """
 from .codon_utils import parseinput
 
+def get_component_graph(codons: list, component_index: int) -> dict:
+    """
+    Get the i-th component of the representing graph for a set of codons.
+    
+    For a codon of length n, component i (1 <= i <= n-1) splits each codon
+    at position i, creating edges from the first i characters to the remaining characters.
+    
+    Args:
+        codons: List of codons (all should have the same length)
+        component_index: The component index (1-based, 1 <= i <= n-1)
+        
+    Returns:
+        Dictionary with "rows" containing the edges as [source, target] pairs
+    """
+    if not codons:
+        return {"rows": []}
+    
+    # Validate component index
+    codon_length = len(codons[0])
+    if component_index < 1 or component_index >= codon_length:
+        return {"rows": []}
+    
+    # Create edges by splitting each codon at the component position
+    edges = []
+    for codon in codons:
+        source = codon[:component_index]
+        target = codon[component_index:]
+        edges.append([source, target])
+    
+    return {"rows": edges}
+
+def get_full_representing_graph(codons: list) -> dict:
+    """
+    Get the full representing graph for a set of codons.
+    
+    This creates edges for all possible splits of each codon.
+    For a codon of length n, this creates n-1 edges per codon.
+    
+    Args:
+        codons: List of codons (all should have the same length)
+        
+    Returns:
+        Dictionary with "rows" containing all edges as [source, target] pairs
+    """
+    if not codons:
+        return {"rows": []}
+    
+    codon_length = len(codons[0])
+    all_edges = []
+    
+    # For each codon, create edges for all possible splits
+    for codon in codons:
+        for i in range(1, codon_length):
+            source = codon[:i]
+            target = codon[i:]
+            all_edges.append([source, target])
+    
+    # Remove duplicates while preserving order
+    seen = set()
+    unique_edges = []
+    for edge in all_edges:
+        edge_tuple = tuple(edge)
+        if edge_tuple not in seen:
+            seen.add(edge_tuple)
+            unique_edges.append(edge)
+    
+    return {"rows": unique_edges}
+
 def process_codons_2_2(codons: list) -> dict:
-    """Process codons for any length using 2-2 breakdown."""
+    """Process codons using 2-2 breakdown (middle split for even-length codons)."""
     if not codons:
         return {"rows": []}
         
     codon_length = len(codons[0])
-    half_length = codon_length // 2
-
-    groups = {}
-    suffix_map = {}
     
-    # Group by prefix
-    for i, codon in enumerate(codons):
-        prefix = codon[:half_length]
-        suffix = codon[-half_length:]
-        groups.setdefault(prefix, []).append((i, codon))
-        suffix_map.setdefault(suffix, []).append(i)
-
-    default_rows = []
-    connection_rows = []
-
-    # Process each group
-    for prefix, items in groups.items():
-        items.sort(key=lambda x: x[0])
-        if len(items) < 3:
-            for i, codon in items:
-                default_rows.append((i, codon[:half_length], codon[half_length:]))
-        else:
-            count = 0
-            for i, codon in items:
-                if count < 2:
-                    default_rows.append((i, codon[:half_length], codon[half_length:]))
-                    count += 1
-                else:
-                    if prefix in suffix_map:
-                        order_index = min(suffix_map[prefix])
-                        connection_rows.append((order_index, codon[:half_length], codon[half_length:]))
-                        break
-                    else:
-                        default_rows.append((i, codon[:half_length], codon[half_length:]))
-                        count += 1
-
-    # Combine all rows
-    all_rows = []
-    for order, left, right in default_rows:
-        all_rows.append((order, 0, left, right))
-    for order, left, right in connection_rows:
-        all_rows.append((order, 1, left, right))
-    all_rows.sort(key=lambda x: (x[0], x[1]))
-
-    # Return formatted rows
-    return {"rows": [[left, right] for _, _, left, right in all_rows]}
+    # For 2-2 breakdown, we split at the middle
+    if codon_length % 2 != 0:
+        # For odd-length codons, we can't do a perfect 2-2 split
+        # Use the closest to middle split
+        split_pos = codon_length // 2
+    else:
+        # For even-length codons, split exactly in the middle
+        split_pos = codon_length // 2
+    
+    return get_component_graph(codons, split_pos)
 
 def process_codons_rest_1(codons: list) -> dict:
-    """Process codons using rest-1 breakdown."""
-    codon_length = len(codons[0])
-    if codon_length > 5 or codon_length < 2:
+    """Process codons using rest-1 breakdown (split after first n-1 characters)."""
+    if not codons:
         return {"rows": []}
-
-    groups = {}
-    for i, codon in enumerate(codons):
-        # Group based on the substring from index 2 to the end
-        prefix = codon[2:]
-        groups.setdefault(prefix, []).append((i, codon))
-
-    suffix_map = {}
-    for i, codon in enumerate(codons):
-        suffix = codon[-2:]
-        suffix_map.setdefault(suffix, []).append(i)
-
-    default_rows = []
-    connection_rows = []
-
-    for prefix, items in groups.items():
-        items.sort(key=lambda x: x[0])
-        if len(items) < 3:
-            for i, codon in items:
-                # Use first two letters and the last character as before
-                default_rows.append((i, codon[:2], codon[-1:]))
-        else:
-            count = 0
-            for i, codon in items:
-                if count < 2:
-                    default_rows.append((i, codon[:2], codon[-1:]))
-                    count += 1
-                else:
-                    if prefix in suffix_map:
-                        order_index = min(suffix_map[prefix])
-                        connection_rows.append((order_index, codon[:2], codon[2:]))
-                        break
-                    else:
-                        default_rows.append((i, codon[:2], codon[-1:]))
-                        count += 1
-
-    all_rows = []
-    for order, left, right in default_rows:
-        all_rows.append((order, 0, left, right))
-    for order, left, right in connection_rows:
-        all_rows.append((order, 1, left, right))
-    all_rows.sort(key=lambda x: (x[0], x[1]))
-
-    output_rows = [[left, right] for _, _, left, right in all_rows]
-    return {"rows": output_rows}
+        
+    codon_length = len(codons[0])
+    if codon_length < 2:
+        return {"rows": []}
+    
+    # Split after the first n-1 characters (leaving 1 character on the right)
+    split_pos = codon_length - 1
+    return get_component_graph(codons, split_pos)
 
 def process_codons_1_rest(codons: list) -> dict:
-    """Process codons using 1-rest breakdown."""
+    """Process codons using 1-rest breakdown (split after first character)."""
+    if not codons:
+        return {"rows": []}
+        
     codon_length = len(codons[0])
-    groups = {}
-    for i, codon in enumerate(codons):
-        prefix = codon[:2]
-        groups.setdefault(prefix, []).append((i, codon))
-
-    suffix_map = {}
-    for i, codon in enumerate(codons):
-        suffix = codon[-2:]
-        suffix_map.setdefault(suffix, []).append(i)
-
-    default_rows = []
-    connection_rows = []
-
-    for prefix, items in groups.items():
-        items.sort(key=lambda x: x[0])
-        if len(items) < 3:
-            for i, codon in items:
-                default_rows.append((i, codon[0], codon[1:]))
-        else:
-            count = 0
-            for i, codon in items:
-                if count < 2:
-                    default_rows.append((i, codon[0], codon[1:]))
-                    count += 1
-                else:
-                    if prefix in suffix_map:
-                        order_index = min(suffix_map[prefix])
-                        connection_rows.append((order_index, codon[:2], codon[2:]))
-                        break
-                    else:
-                        default_rows.append((i, codon[0], codon[1:]))
-                        count += 1
-
-    all_rows = []
-    for order, left, right in default_rows:
-        all_rows.append((order, 0, left, right))
-    for order, left, right in connection_rows:
-        all_rows.append((order, 1, left, right))
-    all_rows.sort(key=lambda x: (x[0], x[1]))
-
-    output_rows = [[left, right] for _, _, left, right in all_rows]
-    return {"rows": output_rows}
+    if codon_length < 2:
+        return {"rows": []}
+    
+    # Split after the first character
+    split_pos = 1
+    return get_component_graph(codons, split_pos)
 
 def merge_rows(dict1, dict2):
     """Merge two dictionaries containing rows."""

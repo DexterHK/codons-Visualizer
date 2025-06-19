@@ -24,6 +24,9 @@ export default function GraphsTabs({ activeTab, setActiveTab, numOfCodons }) {
         <li className={activeTab === (numOfCodons === 2 ? 2 : numOfCodons === 3 ? 3 : 4) ? "active" : ""}>
           <button onClick={() => setActiveTab(numOfCodons === 2 ? 2 : numOfCodons === 3 ? 3 : 4)}>C{numOfCodons}</button>
         </li>
+        <li className={activeTab === (numOfCodons === 2 ? 3 : numOfCodons === 3 ? 4 : 5) ? "active" : ""}>
+          <button onClick={() => setActiveTab(numOfCodons === 2 ? 3 : numOfCodons === 3 ? 4 : 5)}>C-Cytoscape</button>
+        </li>
       </ul>
     </nav>
   );

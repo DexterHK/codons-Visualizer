@@ -2,8 +2,23 @@ import React from "react";
 import { useRef } from "react";
 import { darkTheme, lightTheme, GraphCanvas, useSelection } from "reagraph";
 import { useStore } from "../store";
+import { 
+  sortNodes, 
+  sortEdges, 
+  calculateNodeDegrees, 
+  getOptimalLayoutConfig,
+  bundleEdges 
+} from "../utils/graphSorting";
 
-export default function Graph({ nodes, edges, layout, selections: externalSelections, isC3Tab = false }) {
+export default function Graph({ 
+  nodes, 
+  edges, 
+  layout, 
+  selections: externalSelections, 
+  isC3Tab = false,
+  nodeSortType = 'alphabetical',
+  enableOptimization = false 
+}) {
   const graphRef = useRef(null);
   const [activeElements, setActiveElements] = React.useState([]);
   const theme = useStore((state) => state.theme);
@@ -41,6 +56,32 @@ export default function Graph({ nodes, edges, layout, selections: externalSelect
   }, [externalSelections, edges]);
 
   const allActiveIds = [...activeElements, ...edgeSelections, ...(externalSelections || [])];
+
+  // Apply sorting and optimization to nodes and edges
+  const sortedNodes = React.useMemo(() => {
+    if (!nodes || nodes.length === 0) return nodes;
+    
+    let processedNodes = [...nodes];
+    
+    // Calculate degrees if needed for degree-based sorting
+    if (nodeSortType === 'degree') {
+      processedNodes = calculateNodeDegrees(processedNodes, edges || []);
+    }
+    
+    return sortNodes(processedNodes, nodeSortType);
+  }, [nodes, edges, nodeSortType]);
+
+  // Get optimal layout configuration if optimization is enabled
+  const layoutOverrides = React.useMemo(() => {
+    const baseOverrides = { linkDistance: 500 };
+    
+    if (enableOptimization && sortedNodes && edges) {
+      const optimalConfig = getOptimalLayoutConfig(sortedNodes, edges, layout);
+      return { ...baseOverrides, ...optimalConfig };
+    }
+    
+    return baseOverrides;
+  }, [enableOptimization, sortedNodes, edges, layout]);
 
   // Custom theme that adapts to the current theme
   const customTheme = React.useMemo(() => {
@@ -83,7 +124,7 @@ export default function Graph({ nodes, edges, layout, selections: externalSelect
   }, [theme, isC3Tab]);
 
   // Process edges to ensure proper coloring for C3 tab
-  const processedEdges = React.useMemo(() => {
+  const finalProcessedEdges = React.useMemo(() => {
     if (!isC3Tab) return edges;
     
     return edges.map(edge => ({
@@ -97,8 +138,8 @@ export default function Graph({ nodes, edges, layout, selections: externalSelect
   return (
     <GraphCanvas
       ref={graphRef}
-      nodes={nodes}
-      edges={processedEdges}
+      nodes={sortedNodes || nodes}
+      edges={finalProcessedEdges}
       selections={allActiveIds}
       actives={allActiveIds}
       onNodeClick={onNodeClick}
@@ -110,9 +151,7 @@ export default function Graph({ nodes, edges, layout, selections: externalSelect
       }}
       theme={customTheme}
       layoutType={layout}
-      layoutOverrides={{
-        linkDistance: 500,
-      }}
+      layoutOverrides={layoutOverrides}
       edgeArrowPosition="end"
       edgeLabelPosition="center"
       labelType={isC3Tab ? "all" : "nodes"}
