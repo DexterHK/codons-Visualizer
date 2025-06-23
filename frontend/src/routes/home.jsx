@@ -3,6 +3,7 @@ import "../css/home.css";
 import { useTransition } from "react";
 import { useNavigate } from "react-router";
 import { useStore } from "../store";
+import { API_ENDPOINTS } from "../config/api";
 
 export default function Home() {
   const codons = useStore((state) => state.codons);
@@ -71,7 +72,7 @@ const handleCodonInput = (value) => {
 
     startTransition(async () => {
       const originalResponse = await fetch(
-        "http://localhost:5000/codons-list",
+        API_ENDPOINTS.GRAPHS.ORIGINAL,
         {
           method: "POST",
           headers: {
@@ -82,7 +83,7 @@ const handleCodonInput = (value) => {
       );
 
       const alphaOneResponse = await fetch(
-        "http://localhost:5000/codons-list-alpha-one",
+        API_ENDPOINTS.GRAPHS.ALPHA_ONE,
         {
           method: "POST",
           headers: {
@@ -100,7 +101,7 @@ const handleCodonInput = (value) => {
 
       if (numOfCodons >= 3) {
         alphaTwoResponse = await fetch(
-          "http://localhost:5000/codons-list-alpha-two",
+          API_ENDPOINTS.GRAPHS.ALPHA_TWO,
           {
             method: "POST",
             headers: {
@@ -111,7 +112,7 @@ const handleCodonInput = (value) => {
         );
 
         eigenschaftenAlphaTwoResponse = await fetch(
-          "http://localhost:5000/eigenschaften-alpha-two",
+          API_ENDPOINTS.PROPERTIES.ALPHA_TWO,
           {
             method: "POST",
             headers: {
@@ -124,7 +125,7 @@ const handleCodonInput = (value) => {
 
       if (numOfCodons === 4) {
         alphaThreeResponse = await fetch(
-          "http://localhost:5000/codons-list-alpha-three",
+          API_ENDPOINTS.GRAPHS.ALPHA_THREE,
           {
             method: "POST",
             headers: {
@@ -135,7 +136,7 @@ const handleCodonInput = (value) => {
         );
 
         eigenschaftenAlphaThreeResponse = await fetch(
-          "http://localhost:5000/eigenschaften-alpha-three",
+          API_ENDPOINTS.PROPERTIES.ALPHA_THREE,
           {
             method: "POST",
             headers: {
@@ -147,7 +148,7 @@ const handleCodonInput = (value) => {
       }
 
       const eigenschaftenResponse = await fetch(
-        "http://localhost:5000/eigenschaften",
+        API_ENDPOINTS.PROPERTIES.ORIGINAL,
         {
           method: "POST",
           headers: {
@@ -158,7 +159,7 @@ const handleCodonInput = (value) => {
       );
       
       const eigenschaftenAlphaOneResponse = await fetch(
-        "http://localhost:5000/eigenschaften-alpha-one",
+        API_ENDPOINTS.PROPERTIES.ALPHA_ONE,
         {
           method: "POST",
           headers: {
@@ -169,7 +170,7 @@ const handleCodonInput = (value) => {
       );
 
       const c3Response = await fetch(
-        "http://localhost:5000/eigenschaften-c3",
+        API_ENDPOINTS.PROPERTIES.C3,
         {
           method: "POST",
           headers: {
@@ -181,11 +182,11 @@ const handleCodonInput = (value) => {
 
       // Check responses based on what was fetched
       if (
-        originalResponse.status !== 201 ||
-        alphaOneResponse.status !== 201 ||
-        (alphaTwoResponse && alphaTwoResponse.status !== 201) ||
-        (alphaThreeResponse && alphaThreeResponse.status !== 201) ||
-        c3Response.status !== 201
+        originalResponse.status !== 200 ||
+        alphaOneResponse.status !== 200 ||
+        (alphaTwoResponse && alphaTwoResponse.status !== 200) ||
+        (alphaThreeResponse && alphaThreeResponse.status !== 200) ||
+        c3Response.status !== 200
       ) {
         setError(originalResponse.statusText);
         return;

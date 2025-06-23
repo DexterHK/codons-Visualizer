@@ -13,6 +13,7 @@ import GraphSortingControls from "../components/GraphSortingControls";
 import ThemeToggle from "../components/icons/theme-toggle";
 import Chevron from "../components/icons/chevron";
 import { saveAs } from "file-saver"; // Add this import for file saving
+import { API_ENDPOINTS } from "../config/api";
 
 export default function CodonsGraph() {
   const originalCodons = useStore((state) => state.originalCodons);
@@ -293,7 +294,7 @@ export default function CodonsGraph() {
         numOfCodons: calculationGraph.nodes.length,
       };
 
-      const response = await fetch("http://localhost:5000/longest-path", {
+      const response = await fetch(API_ENDPOINTS.GRAPHS.LONGEST_PATH, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
