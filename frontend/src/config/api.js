@@ -1,5 +1,19 @@
-// API configuration
-const API_BASE_URL = 'http://localhost:5000';
+// API configuration - Dynamic based on environment
+const getApiBaseUrl = () => {
+  // If we're in development (localhost), use localhost backend
+  if (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1') {
+    return 'http://localhost:5000';
+  }
+  
+  // For production, use the same host but port 5000
+  const protocol = window.location.protocol;
+  const hostname = window.location.hostname;
+  
+  // If accessing via domain (gcat.app) or IP, use that host with port 5000
+  return `${protocol}//${hostname}:5000`;
+};
+
+const API_BASE_URL = getApiBaseUrl();
 
 export const API_ENDPOINTS = {
   // Graph endpoints

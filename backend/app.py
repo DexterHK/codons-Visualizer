@@ -7,13 +7,19 @@ def create_app():
     """Application factory pattern for Flask app creation."""
     app = Flask(__name__)
     
-    # Configure CORS - Allow requests from both ports
+    # Configure CORS - Allow requests from development and production
     CORS(app, resources={
         r"/*": {
             "origins": [
+                # Development origins
                 "http://localhost:8080", "http://127.0.0.1:8080", "http://0.0.0.0:8080",
                 "http://localhost:5000", "http://127.0.0.1:5000", "http://0.0.0.0:5000",
-                "http://139.59.213.46:8080", "http://139.59.213.46:5000"
+                "http://localhost:3000", "http://127.0.0.1:3000",
+                # Production origins
+                "http://gcat.app", "https://gcat.app",
+                "http://139.59.213.46", "https://139.59.213.46",
+                "http://139.59.213.46:8080", "https://139.59.213.46:8080",
+                "http://139.59.213.46:3000", "https://139.59.213.46:3000"
             ],
             "methods": ["GET", "POST", "OPTIONS"],
             "allow_headers": ["Content-Type"]
