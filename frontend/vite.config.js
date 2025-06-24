@@ -10,7 +10,7 @@ export default defineConfig({
     allowedHosts:[
       'gcat.app',
       'localhost',            
-      '127.0.0.1'            
+      '127.0.0.1',            
     ]
   }
 })

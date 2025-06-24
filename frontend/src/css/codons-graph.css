@@ -676,6 +676,8 @@ main {
   
   .organization-controls-trigger {
     position: relative;
+    display: flex;
+    justify-content: center;
     right: auto;
     bottom: auto;
     margin: 1rem;
@@ -828,6 +830,7 @@ main {
   transition: all 0.3s ease;
   box-shadow: 0 4px 16px var(--shadow-primary);
   color: var(--text-primary);
+  gap: 10px;
   font-weight: 600;
   min-width: 220px;
 }
@@ -872,7 +875,6 @@ main {
   transition: all 0.3s ease;
   box-shadow: 0 4px 16px var(--shadow-primary);
   color: var(--text-primary);
-  clip-path: polygon(0% 0%, 75% 0%, 100% 50%, 75% 100%, 0% 100%);
 }
 
 /* When footer is expanded - position higher to avoid overlap */

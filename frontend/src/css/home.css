@@ -49,3 +49,34 @@ main {
 .graphs-wrapper {
   position: relative;
 }
+
+.ex-body {
+  position: relative;
+  background: #fff;
+  width: 500px;
+  height: 500px;
+}
+
+.ex {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100px;
+  height: 100px;
+}
+
+.ex-1 {
+  background: red;
+  z-index: 2;
+  opacity: 0.8;
+}
+.ex-2 {
+  background: green;
+  z-index: 1;
+  opacity: .1;
+}
+.ex-3 {
+  background: blue;
+  z-index: 1;
+  opacity: .5;
+}

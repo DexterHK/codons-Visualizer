@@ -4,7 +4,7 @@ Service for handling codon-related operations.
 from utils.codon_utils import (
     remove_spaces, remove_backslashes, parseinput, get_complement, 
     complement, is_self_complementary, is_maximal_self_complementary,
-    word_length, is_comma_free, is_duplicate_free, shift_string,
+    word_length, is_comma_free, is_duplicate_free,
     alph1, alph2, alph3
 )
 from utils.processing_utils import (
@@ -38,9 +38,9 @@ class CodonService:
         """Get word length of code."""
         return word_length(code)
     
-    def check_comma_free(self, code) -> bool:
+    def check_comma_free(self,tuple_length, code) -> bool:
         """Check if code is comma-free."""
-        return is_comma_free(code)
+        return is_comma_free(code,tuple_length)
     
     def check_duplicate_free(self, code) -> bool:
         """Check if code is duplicate-free."""
@@ -57,9 +57,6 @@ class CodonService:
         else:
             raise ValueError("Invalid alpha type. Must be 1, 2, or 3.")
     
-    def shift_sequence(self, sequence: str, shift: int) -> str:
-        """Shift sequence by given amount."""
-        return shift_string(sequence, shift)
     
     def get_component_breakdown(self, codons: list, component_index: int) -> dict:
         """Get component graph breakdown using processing_utils."""

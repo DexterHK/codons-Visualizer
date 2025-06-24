@@ -21,31 +21,103 @@ def rotations(word: str):
     """All proper (non-trivial) cyclic rotations of a word."""
     return {word[i:] + word[:i] for i in range(1, len(word))}
 
-def _proper_suffixes(word):
-    for i in range(1, len(word)):
-        yield word[-i:]
-
-def _proper_prefixes(word):
-    for i in range(1, len(word)):
-        yield word[:i]
 
 ########################################
 # 1. is_comma_free -------------------- #
 ########################################
 
-def is_comma_free(code):
+def shift_sequence_transform(tuples, shift_amount):
     """
-    No concatenation of a non-empty suffix of any code-word with a non-empty
-    prefix of any code-word may itself be a code-word.
+    Implements the ShiftSequence transformation from GCAT.
+    Joins tuples, shifts the string, then splits back into tuples.
     """
-    code_set = set(code)
-    for w1 in code:
-        for s in _proper_suffixes(w1):
-            for w2 in code:
-                for p in _proper_prefixes(w2):
-                    if s + p in code_set:
+    # Join tuples with spaces (like Tuple.joinTuples)
+    joined = ' '.join(tuples)
+    
+    # Apply shift transformation (shift_amount times)
+    for _ in range(shift_amount):
+        # Pattern A: (\\s)(\\S) -> $2$1 (swap space with next non-space)
+        # Pattern B: ^(\\S)(.*)$ -> $2$1 (move first char to end)
+        
+        # First, swap spaces with following non-space characters
+        result = ""
+        i = 0
+        while i < len(joined):
+            if i < len(joined) - 1 and joined[i] == ' ' and joined[i + 1] != ' ':
+                # Swap space with next character
+                result += joined[i + 1] + joined[i]
+                i += 2
+            else:
+                result += joined[i]
+                i += 1
+        
+        # Then move first character to end if it's not a space
+        if result and result[0] != ' ':
+            result = result[1:] + result[0]
+        
+        joined = result
+    
+    # Split back into tuples (like Tuple.splitTuples)
+    return joined.split()
+
+def has_duplicates(strings):
+    """Check if the list of strings contains duplicates."""
+    return len(strings) != len(set(strings))
+
+def collections_disjoint(set1, set2):
+    """Check if two collections have no elements in common (like Collections.disjoint)."""
+    return len(set(set1) & set(set2)) == 0
+
+def is_comma_free(strings, length=None):
+    """
+    Checks if a sequence of strings is comma-free according to the GCAT implementation.
+    
+    This is a direct translation of the Java CommaFree.test() method.
+    
+    Parameters:
+    - strings: List of strings to check.
+    - length: The length of each string (optional, will be inferred if not provided).
+    
+    Returns:
+    - True if the sequence is comma-free, False otherwise.
+    """
+    if not strings:
+        return True  # Empty set is comma-free
+    
+    # Infer length if not provided
+    if length is None:
+        length = len(strings[0]) if strings else 0
+    
+    # Check if all strings have the same length
+    if len(set(len(s) for s in strings)) != 1:
+        return False
+    
+    # Check for duplicates first
+    if has_duplicates(strings):
+        return False
+    
+    # Direct translation of the Java algorithm:
+    # for(Tuple tupleA:tuples) for(Tuple tupleB:tuples)
+    #   if(tupleA!=tupleB) for(shift=1,shifted=Arrays.asList(tupleA,tupleB);shift<length;shift++)
+    #     if(!Collections.disjoint(tuples,shifted = SHIFT.transform(shifted))) {
+    
+    for tupleA in strings:
+        for tupleB in strings:
+            if tupleA != tupleB:
+                # Create initial shifted collection: Arrays.asList(tupleA, tupleB)
+                shifted = [tupleA, tupleB]
+                
+                # For each shift from 1 to length-1
+                for shift in range(1, length):
+                    # Apply SHIFT.transform(shifted)
+                    shifted = shift_sequence_transform(shifted, 1)
+                    
+                    # Check if Collections.disjoint(tuples, shifted) is false
+                    if not collections_disjoint(strings, shifted):
                         return False
-    return True
+    
+    return True  # No collision found
+
 
 ########################################
 # 2. is_circular ---------------------- #
@@ -57,6 +129,11 @@ def is_circular(code):
     Build the representing graph G(X) and reject if it contains a directed
     cycle, because a cycle ↔ two distinct circular decompositions.
     """
+    if has_duplicates(code):
+        return False
+    
+    if len(set(len(s) for s in code)) != 1:
+        return False
     V = set()
     E = dict()          # adjacency list
     for w in code:
@@ -83,7 +160,7 @@ def is_circular(code):
 # 3. is_C3 ---------------------------- #
 ########################################
 
-def is_C3(code):
+def is_C3(length,code):
     """
     A code is C³ iff the code itself *and* the two rotation codes obtained by
     shifting every word left by 1 or 2 positions are circular.                  
@@ -93,9 +170,12 @@ def is_C3(code):
     wlen = {len(w) for w in code}
     if len(wlen) != 1:
         return False                     # definition assumes fixed length
-    shift1 = {w[1:] + w[:1] for w in code}
-    shift2 = {w[2:] + w[:2] for w in code}
-    return is_circular(code) and is_circular(shift1) and is_circular(shift2)
+    result = "".join(code)
+    shift1 = alph1(result)
+    shift2 = alph2(result)
+    shift1_list = parseinput(length,shift1)
+    shift2_list = parseinput(length,shift2)
+    return is_circular(code) and is_circular(shift1_list) and is_circular(shift2_list)
 
 ########################################
 # 4. is_self_complementary ------------ #
@@ -126,14 +206,14 @@ def is_duplicate_free(code):
 # convenience bundle ------------------ #
 ########################################
 
-def analyse_code(code):
+def analyse_code(length,code):
     """Return a dict with all five yes/no diagnostics."""
     return dict(
         duplicate_free      = is_duplicate_free(code),
         self_complementary  = is_self_complementary(code),
-        comma_free          = is_comma_free(code),
+        comma_free          = is_comma_free(code,length),
         circular            = is_circular(code),
-        C3                  = is_C3(code),
+        C3                  = is_C3(length,code),
         maximal_self_complementary = is_maximal_self_complementary(code)
     )
 
@@ -156,7 +236,7 @@ def properties(number, codon_input):
     """Get properties for original codons."""
     parsed_input = parseinput(number, codon_input)
     code_list = list(parsed_input)
-    analysis = analyse_code(code_list)
+    analysis = analyse_code(number,code_list)
     
     # Map to legacy format
     eigenshaften_parameter = {
@@ -173,7 +253,7 @@ def properties_alpha_one(number, codon_input):
     alpha_input = alph1(codon_input)
     parsed_input = parseinput(number, alpha_input)
     code_list = list(parsed_input)
-    analysis = analyse_code(code_list)
+    analysis = analyse_code(number,code_list)
     
     properties_parameter1 = {
         "maximal self complementary": analysis['maximal_self_complementary'],  # Not implemented in new version
@@ -189,7 +269,7 @@ def properties_alpha_two(number, codon_input):
     alpha_input = alph2(codon_input)
     parsed_input = parseinput(number, alpha_input)
     code_list = list(parsed_input)
-    analysis = analyse_code(code_list)
+    analysis = analyse_code(number,code_list)
     
     properties_parameter2 = {
         "maximal self complementary": analysis['maximal_self_complementary'],  # Not implemented in new version
@@ -205,7 +285,7 @@ def properties_alpha_three(number, codon_input):
     alpha_input = alph3(codon_input, number)
     parsed_input = parseinput(number, alpha_input)
     code_list = list(parsed_input)
-    analysis = analyse_code(code_list)
+    analysis = analyse_code(number,code_list)
     
     properties_parameter3 = {
         "maximal self complementary": analysis['maximal_self_complementary'],
@@ -218,6 +298,5 @@ def properties_alpha_three(number, codon_input):
 
 def c3(number, codon_input):
     """Check C3 properties for codons."""
-    parsed_input = last_parse(number, codon_input)
-    code_list = [row for row in parsed_input['rows']]
-    return is_C3(code_list)
+    parsed_input = parseinput(number, codon_input)
+    return is_C3(number,parsed_input)

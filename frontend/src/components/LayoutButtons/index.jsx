@@ -3,14 +3,15 @@ import React from "react";
 import "./styles.css";
 import ForceDirected from "../icons/force-directed";
 import Circular from "../icons/circular";
+import { Columns } from "../icons/columns";
 
 export default function LayoutButtons({ setLayout, layout, toggleLongestPath }) {
   return (
     <div className="layout-buttons">
       <button
         type="button"
-        className={`circular2d ${layout === "circular2d" && "active"}`}
-        onClick={() => setLayout("circular2d")}
+        className={`circular ${layout === "circular" && "active"}`}
+        onClick={() => setLayout("circular")}
       >
         <span>Circular</span>
         <Circular />
@@ -18,11 +19,20 @@ export default function LayoutButtons({ setLayout, layout, toggleLongestPath }) 
 
       <button
         type="button"
-        className={`forceDirected2d ${layout === "forceDirected2d" && "active"}`}
-        onClick={() => setLayout("forceDirected2d")}
+        className={`force ${layout === "force" && "active"}`}
+        onClick={() => setLayout("force")}
       >
         <span>Force Directed</span>
         <ForceDirected />
+      </button>
+
+      <button
+        type="button"
+        className={`columns ${layout === "columns" && "active"}`}
+        onClick={() => setLayout("columns")}
+      >
+        <span>Columns</span>
+        <Columns />
       </button>
       <button
         type="button"

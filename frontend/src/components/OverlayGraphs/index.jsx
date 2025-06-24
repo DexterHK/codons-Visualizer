@@ -1,108 +1,179 @@
 import React, { useState } from "react";
-import Graph from "../graph";
 import "./styles.css";
+import GraphV2 from "../graph-v2";
+import { usePressedKey } from "../../hooks/usePressedKey";
+import { useEffect } from "react";
 
-export default function OverlayGraphs({ 
-  originalCodons, 
-  alphaOne, 
-  alphaTwo, 
-  alphaThree,
-  layout, 
-  selections, 
-  generateUniqueEdgeId,
-  numOfCodons 
+export default function OverlayGraphs({
+  originalNodes,
+  originalEdges,
+  alphaOneNodes,
+  alphaOneEdges,
+  alphaTwoNodes,
+  alphaTwoEdges,
+  alphaThreeNodes,
+  alphaThreeEdges,
+  layout,
+  numOfCodons,
 }) {
   const [graphOpacity, setGraphOpacity] = useState({
-    original: 0.8,
-    alphaOne: 0.8,
-    alphaTwo: 0.8,
-    alphaThree: 0.8,
+    original: 1,
+    alphaOne: 0.5,
+    alphaTwo: 0.5,
+    alphaThree: 0.5,
   });
 
   const [graphZIndex, setGraphZIndex] = useState({
-    original: 4,
-    alphaOne: 3,
-    alphaTwo: 2,
+    original: 2,
+    alphaOne: 1,
+    alphaTwo: 1,
     alphaThree: 1,
   });
 
+  const pressedKey = usePressedKey(["z", "x", "c", "v"]);
+
+  const [prevZIndexsState, setPrevZIndexsState] = useState({});
+
+  const graphKeyMapping = {
+    z: "original",
+    x: "alphaOne",
+    c: "alphaTwo",
+    v: "alphaThree",
+  }
+
   const handleOpacityChange = (graph, value) => {
-    setGraphOpacity(prev => ({
+    setGraphOpacity((prev) => ({
       ...prev,
-      [graph]: parseFloat(value)
+      [graph]: parseFloat(value),
     }));
   };
 
   const bringToFront = (graph) => {
-    const maxZ = Math.max(...Object.values(graphZIndex));
-    setGraphZIndex(prev => ({
+    const currentTop = Object.keys(graphZIndex).find(
+      (key) => graphZIndex[key] === 2,
+    );
+    if (currentTop) {
+      setGraphZIndex((prev) => ({
+        ...prev,
+        [currentTop]: 1,
+      }));
+    }
+    setGraphZIndex((prev) => ({
       ...prev,
-      [graph]: maxZ + 1
+      [graph]: 2,
     }));
   };
+
+  useEffect(() => {
+    setPrevZIndexsState({
+      graphZIndex,
+    });
+
+    if (pressedKey && graphKeyMapping[pressedKey]) {
+      bringToFront(graphKeyMapping[pressedKey]);
+    }
+    if (!pressedKey) {
+      setGraphZIndex(prevZIndexsState);
+    }
+  }, [pressedKey]);
 
   // Generate preset buttons based on available graphs
   const generatePresetButtons = () => {
     const buttons = [];
-    const availableGraphs = ['original', 'alphaOne'];
-    if (numOfCodons >= 3) availableGraphs.push('alphaTwo');
-    if (numOfCodons === 4) availableGraphs.push('alphaThree');
+    const availableGraphs = ["original", "alphaOne"];
+    if (numOfCodons >= 3) availableGraphs.push("alphaTwo");
+    if (numOfCodons === 4) availableGraphs.push("alphaThree");
 
     // Focus buttons for each graph
     buttons.push(
-      <button key="focus-original" onClick={() => {
-        const newOpacity = { original: 1, alphaOne: 0.3, alphaTwo: 0.3, alphaThree: 0.3 };
-        setGraphOpacity(newOpacity);
-      }}>
+      <button
+        key="focus-original"
+        onClick={() => {
+          const newOpacity = {
+            original: 1,
+            alphaOne: 0.3,
+            alphaTwo: 0.3,
+            alphaThree: 0.3,
+          };
+          setGraphOpacity(newOpacity);
+        }}
+      >
         Focus Original
-      </button>
+      </button>,
     );
 
     buttons.push(
-      <button key="focus-alpha1" onClick={() => {
-        const newOpacity = { original: 0.3, alphaOne: 1, alphaTwo: 0.3, alphaThree: 0.3 };
-        setGraphOpacity(newOpacity);
-      }}>
+      <button
+        key="focus-alpha1"
+        onClick={() => {
+          const newOpacity = {
+            original: 0.3,
+            alphaOne: 1,
+            alphaTwo: 0.3,
+            alphaThree: 0.3,
+          };
+          setGraphOpacity(newOpacity);
+        }}
+      >
         Focus Alpha 1
-      </button>
+      </button>,
     );
 
     if (numOfCodons >= 3) {
       buttons.push(
-        <button key="focus-alpha2" onClick={() => {
-          const newOpacity = { original: 0.3, alphaOne: 0.3, alphaTwo: 1, alphaThree: 0.3 };
-          setGraphOpacity(newOpacity);
-        }}>
+        <button
+          key="focus-alpha2"
+          onClick={() => {
+            const newOpacity = {
+              original: 0.3,
+              alphaOne: 0.3,
+              alphaTwo: 1,
+              alphaThree: 0.3,
+            };
+            setGraphOpacity(newOpacity);
+          }}
+        >
           Focus Alpha 2
-        </button>
+        </button>,
       );
     }
 
     if (numOfCodons === 4) {
       buttons.push(
-        <button key="focus-alpha3" onClick={() => {
-          const newOpacity = { original: 0.3, alphaOne: 0.3, alphaTwo: 0.3, alphaThree: 1 };
-          setGraphOpacity(newOpacity);
-        }}>
+        <button
+          key="focus-alpha3"
+          onClick={() => {
+            const newOpacity = {
+              original: 0.3,
+              alphaOne: 0.3,
+              alphaTwo: 0.3,
+              alphaThree: 1,
+            };
+            setGraphOpacity(newOpacity);
+          }}
+        >
           Focus Alpha 3
-        </button>
+        </button>,
       );
     }
 
     // Equal opacity button
     buttons.push(
-      <button key="equal-opacity" onClick={() => {
-        const equalValue = 0.7;
-        const newOpacity = { 
-          original: equalValue, 
-          alphaOne: equalValue, 
-          alphaTwo: numOfCodons >= 3 ? equalValue : 0.3, 
-          alphaThree: numOfCodons === 4 ? equalValue : 0.3 
-        };
-        setGraphOpacity(newOpacity);
-      }}>
+      <button
+        key="equal-opacity"
+        onClick={() => {
+          const equalValue = 0.7;
+          const newOpacity = {
+            original: equalValue,
+            alphaOne: equalValue,
+            alphaTwo: numOfCodons >= 3 ? equalValue : 0.3,
+            alphaThree: numOfCodons === 4 ? equalValue : 0.3,
+          };
+          setGraphOpacity(newOpacity);
+        }}
+      >
         Equal Opacity
-      </button>
+      </button>,
     );
 
     return buttons;
@@ -114,7 +185,7 @@ export default function OverlayGraphs({
         <h4>Graph Controls</h4>
         <div className="control-group">
           <label>
-            <span style={{ color: '#90C67C' }}>Original Graph</span>
+            <span style={{ color: "#90C67C" }}>Original Graph</span>
             <div className="control-row">
               <input
                 type="range"
@@ -122,19 +193,21 @@ export default function OverlayGraphs({
                 max="1"
                 step="0.1"
                 value={graphOpacity.original}
-                onChange={(e) => handleOpacityChange('original', e.target.value)}
+                onChange={(e) =>
+                  handleOpacityChange("original", e.target.value)
+                }
               />
-              <button 
+              <button
                 className="bring-front-btn"
-                onClick={() => bringToFront('original')}
+                onClick={() => bringToFront("original")}
               >
                 Bring to Front
               </button>
             </div>
           </label>
-          
+
           <label>
-            <span style={{ color: '#60B5FF' }}>Alpha One Graph</span>
+            <span style={{ color: "#60B5FF" }}>Alpha One Graph</span>
             <div className="control-row">
               <input
                 type="range"
@@ -142,20 +215,22 @@ export default function OverlayGraphs({
                 max="1"
                 step="0.1"
                 value={graphOpacity.alphaOne}
-                onChange={(e) => handleOpacityChange('alphaOne', e.target.value)}
+                onChange={(e) =>
+                  handleOpacityChange("alphaOne", e.target.value)
+                }
               />
-              <button 
+              <button
                 className="bring-front-btn"
-                onClick={() => bringToFront('alphaOne')}
+                onClick={() => bringToFront("alphaOne")}
               >
                 Bring to Front
               </button>
             </div>
           </label>
-          
+
           {numOfCodons >= 3 && (
             <label>
-              <span style={{ color: '#E78B48' }}>Alpha Two Graph</span>
+              <span style={{ color: "#E78B48" }}>Alpha Two Graph</span>
               <div className="control-row">
                 <input
                   type="range"
@@ -163,11 +238,13 @@ export default function OverlayGraphs({
                   max="1"
                   step="0.1"
                   value={graphOpacity.alphaTwo}
-                  onChange={(e) => handleOpacityChange('alphaTwo', e.target.value)}
+                  onChange={(e) =>
+                    handleOpacityChange("alphaTwo", e.target.value)
+                  }
                 />
-                <button 
+                <button
                   className="bring-front-btn"
-                  onClick={() => bringToFront('alphaTwo')}
+                  onClick={() => bringToFront("alphaTwo")}
                 >
                   Bring to Front
                 </button>
@@ -177,7 +254,7 @@ export default function OverlayGraphs({
 
           {numOfCodons === 4 && (
             <label>
-              <span style={{ color: '#ff69b4' }}>Alpha Three Graph</span>
+              <span style={{ color: "#ff69b4" }}>Alpha Three Graph</span>
               <div className="control-row">
                 <input
                   type="range"
@@ -185,11 +262,13 @@ export default function OverlayGraphs({
                   max="1"
                   step="0.1"
                   value={graphOpacity.alphaThree}
-                  onChange={(e) => handleOpacityChange('alphaThree', e.target.value)}
+                  onChange={(e) =>
+                    handleOpacityChange("alphaThree", e.target.value)
+                  }
                 />
-                <button 
+                <button
                   className="bring-front-btn"
-                  onClick={() => bringToFront('alphaThree')}
+                  onClick={() => bringToFront("alphaThree")}
                 >
                   Bring to Front
                 </button>
@@ -197,117 +276,71 @@ export default function OverlayGraphs({
             </label>
           )}
         </div>
-        
-        <div className="preset-buttons">
-          {generatePresetButtons()}
-        </div>
+
+        <div className="preset-buttons">{generatePresetButtons()}</div>
       </div>
 
       <div className="overlay-graphs">
-        <div 
+        <div
           className="overlay-graph-layer"
-          style={{ 
+          style={{
             opacity: graphOpacity.original,
-            zIndex: graphZIndex.original 
+            zIndex: graphZIndex.original,
           }}
         >
-          <Graph
-            nodes={originalCodons.nodes.map(node => ({
-              id: `${node}o_overlay`,
-              label: node,
-              fill: "#90C67C"
-            }))}
-            edges={originalCodons.edges.map((edge, index) => ({
-              source: `${edge[0]}o_overlay`,
-              target: `${edge[1]}o_overlay`,
-              id: generateUniqueEdgeId(edge[0], edge[1], 'o_overlay', index),
-              label: "",
-              color: "#90C67C"
-            }))}
-            layout={layout}
-            selections={selections.filter(sel => sel.includes('o_overlay'))}
-            isC3Tab={false}
+          <GraphV2
+            initialNodes={originalNodes}
+            initialEdges={originalEdges}
+            layoutType={layout}
+            nodeColor="#90C67C"
           />
         </div>
 
-        <div 
+        <div
           className="overlay-graph-layer"
-          style={{ 
+          style={{
             opacity: graphOpacity.alphaOne,
-            zIndex: graphZIndex.alphaOne 
+            zIndex: graphZIndex.alphaOne,
           }}
         >
-          <Graph
-            nodes={alphaOne.nodes.map(node => ({
-              id: `${node}a1_overlay`,
-              label: node,
-              fill: "#60B5FF"
-            }))}
-            edges={alphaOne.edges.map((edge, index) => ({
-              source: `${edge[0]}a1_overlay`,
-              target: `${edge[1]}a1_overlay`,
-              id: generateUniqueEdgeId(edge[0], edge[1], 'a1_overlay', index),
-              label: "",
-              color: "#60B5FF"
-            }))}
-            layout={layout}
-            selections={selections.filter(sel => sel.includes('a1_overlay'))}
-            isC3Tab={false}
+          <GraphV2
+            initialNodes={alphaOneNodes}
+            initialEdges={alphaOneEdges}
+            layoutType={layout}
+            nodeColor="#60B5FF"
           />
         </div>
 
-        {numOfCodons >= 3 && alphaTwo && (
-          <div 
+        {numOfCodons >= 3 && alphaOneNodes && (
+          <div
             className="overlay-graph-layer"
-            style={{ 
+            style={{
               opacity: graphOpacity.alphaTwo,
-              zIndex: graphZIndex.alphaTwo 
+              zIndex: graphZIndex.alphaTwo,
             }}
           >
-            <Graph
-              nodes={alphaTwo.nodes.map(node => ({
-                id: `${node}a2_overlay`,
-                label: node,
-                fill: "#E78B48"
-              }))}
-              edges={alphaTwo.edges.map((edge, index) => ({
-                source: `${edge[0]}a2_overlay`,
-                target: `${edge[1]}a2_overlay`,
-                id: generateUniqueEdgeId(edge[0], edge[1], 'a2_overlay', index),
-                label: "",
-                color: "#E78B48"
-              }))}
-              layout={layout}
-              selections={selections.filter(sel => sel.includes('a2_overlay'))}
-              isC3Tab={false}
+            <GraphV2
+              initialNodes={alphaTwoNodes}
+              initialEdges={alphaTwoEdges}
+              layoutType={layout}
+              nodeColor="#E78B48"
             />
           </div>
         )}
 
-        {numOfCodons === 4 && alphaThree && (
-          <div 
+        {numOfCodons === 4 && alphaThreeNodes && (
+          <div
             className="overlay-graph-layer"
-            style={{ 
+            style={{
               opacity: graphOpacity.alphaThree,
-              zIndex: graphZIndex.alphaThree 
+              zIndex: graphZIndex.alphaThree,
             }}
           >
-            <Graph
-              nodes={alphaThree.nodes.map(node => ({
-                id: `${node}a3_overlay`,
-                label: node,
-                fill: "#ff69b4"
-              }))}
-              edges={alphaThree.edges.map((edge, index) => ({
-                source: `${edge[0]}a3_overlay`,
-                target: `${edge[1]}a3_overlay`,
-                id: generateUniqueEdgeId(edge[0], edge[1], 'a3_overlay', index),
-                label: "",
-                color: "#ff69b4"
-              }))}
-              layout={layout}
-              selections={selections.filter(sel => sel.includes('a3_overlay'))}
-              isC3Tab={false}
+            <GraphV2
+              initialNodes={alphaThreeNodes}
+              initialEdges={alphaThreeEdges}
+              layoutType={layout}
+              nodeColor="#ff69b4"
             />
           </div>
         )}

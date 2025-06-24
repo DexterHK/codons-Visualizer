@@ -1,8 +1,9 @@
-import React, { useState } from "react";
+import React from "react";
 import "../css/home.css";
 import { useTransition } from "react";
 import { useNavigate } from "react-router";
 import { useStore } from "../store";
+import FlowGraph from "../components/graph-v2";
 import { API_ENDPOINTS } from "../config/api";
 
 export default function Home() {
@@ -17,47 +18,52 @@ export default function Home() {
   const setAlphaTwo = useStore((state) => state.setAlphaTwo);
   const setAlphaThree = useStore((state) => state.setAlphaThree);
   const setEigenschaften = useStore((state) => state.setEigenschaften);
-  const setEigenschaftenAlphaOne = useStore((state) => state.setEigenschaftenAlphaOne);
-  const setEigenschaftenAlphaTwo = useStore((state) => state.setEigenschaftenAlphaTwo);
-  const setEigenschaftenAlphaThree = useStore((state) => state.setEigenschaftenAlphaThree);
+  const setEigenschaftenAlphaOne = useStore(
+    (state) => state.setEigenschaftenAlphaOne,
+  );
+  const setEigenschaftenAlphaTwo = useStore(
+    (state) => state.setEigenschaftenAlphaTwo,
+  );
+  const setEigenschaftenAlphaThree = useStore(
+    (state) => state.setEigenschaftenAlphaThree,
+  );
   const setC3 = useStore((state) => state.setC3);
 
   const [isPending, startTransition] = useTransition();
 
   const navigate = useNavigate();
 
-   const formatCodonsInGroups = (value, numberOfCodons) => {
-  // Return if invalid number of codons
-  if (numberOfCodons > 4 || numberOfCodons < 2) return value;
-  
-  // Remove any existing spaces
-  const cleanValue = value.replace(/\s/g, '');
-  
-  // Create regex pattern based on number of codons
-  const regex = new RegExp(`.{${numberOfCodons}}`, 'g');
-  
-  // Match full groups and get remainder
-  const matches = cleanValue.match(regex) || [];
-  const remainder = cleanValue.slice(matches.join('').length);
-  
-  // Combine full groups with spaces and add remainder
-  return matches.join(' ') + (remainder ? ' ' + remainder : '');
-};
+  const formatCodonsInGroups = (value, numberOfCodons) => {
+    // Return if invalid number of codons
+    if (numberOfCodons > 4 || numberOfCodons < 2) return value;
 
-// Update the codon input handler
-const handleCodonInput = (value) => {
-  // Filter invalid characters
-  const filteredValue = value.toUpperCase().replace(/[^CGTA]/g, '');
-  // Format with spaces based on current numOfCodons
-  const formattedValue = formatCodonsInGroups(filteredValue, numOfCodons);
-  setCodons(formattedValue);
-};
- 
+    // Remove any existing spaces
+    const cleanValue = value.replace(/\s/g, "");
+
+    // Create regex pattern based on number of codons
+    const regex = new RegExp(`.{${numberOfCodons}}`, "g");
+
+    // Match full groups and get remainder
+    const matches = cleanValue.match(regex) || [];
+    const remainder = cleanValue.slice(matches.join("").length);
+
+    // Combine full groups with spaces and add remainder
+    return matches.join(" ") + (remainder ? " " + remainder : "");
+  };
+
+  // Update the codon input handler
+  const handleCodonInput = (value) => {
+    // Filter invalid characters
+    const filteredValue = value.toUpperCase().replace(/[^CGTA]/g, "");
+    // Format with spaces based on current numOfCodons
+    const formattedValue = formatCodonsInGroups(filteredValue, numOfCodons);
+    setCodons(formattedValue);
+  };
 
   const handleSubmit = (e) => {
     e.preventDefault();
 
-    const cleanCodons = codons.replace(/\s/g, '');
+    const cleanCodons = codons.replace(/\s/g, "");
 
     // Validate input before submission
     if (!/^[CGTA]+$/i.test(cleanCodons)) {
@@ -71,27 +77,21 @@ const handleCodonInput = (value) => {
     }
 
     startTransition(async () => {
-      const originalResponse = await fetch(
-        API_ENDPOINTS.GRAPHS.ORIGINAL,
-        {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify({ codons: cleanCodons, numOfCodons }),
+      const originalResponse = await fetch(API_ENDPOINTS.GRAPHS.ORIGINAL, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
         },
-      );
+        body: JSON.stringify({ codons: cleanCodons, numOfCodons }),
+      });
 
-      const alphaOneResponse = await fetch(
-        API_ENDPOINTS.GRAPHS.ALPHA_ONE,
-        {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify({ codons: cleanCodons, numOfCodons }),
+      const alphaOneResponse = await fetch(API_ENDPOINTS.GRAPHS.ALPHA_ONE, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
         },
-      );
+        body: JSON.stringify({ codons: cleanCodons, numOfCodons }),
+      });
 
       // Only fetch alphaTwo and alphaThree if numOfCodons >= 3 and 4 respectively
       let alphaTwoResponse = null;
@@ -100,16 +100,13 @@ const handleCodonInput = (value) => {
       let eigenschaftenAlphaThreeResponse = null;
 
       if (numOfCodons >= 3) {
-        alphaTwoResponse = await fetch(
-          API_ENDPOINTS.GRAPHS.ALPHA_TWO,
-          {
-            method: "POST",
-            headers: {
-              "Content-Type": "application/json",
-            },
-            body: JSON.stringify({ codons: cleanCodons, numOfCodons }),
+        alphaTwoResponse = await fetch(API_ENDPOINTS.GRAPHS.ALPHA_TWO, {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
           },
-        );
+          body: JSON.stringify({ codons: cleanCodons, numOfCodons }),
+        });
 
         eigenschaftenAlphaTwoResponse = await fetch(
           API_ENDPOINTS.PROPERTIES.ALPHA_TWO,
@@ -124,16 +121,13 @@ const handleCodonInput = (value) => {
       }
 
       if (numOfCodons === 4) {
-        alphaThreeResponse = await fetch(
-          API_ENDPOINTS.GRAPHS.ALPHA_THREE,
-          {
-            method: "POST",
-            headers: {
-              "Content-Type": "application/json",
-            },
-            body: JSON.stringify({ codons: cleanCodons, numOfCodons }),
+        alphaThreeResponse = await fetch(API_ENDPOINTS.GRAPHS.ALPHA_THREE, {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
           },
-        );
+          body: JSON.stringify({ codons: cleanCodons, numOfCodons }),
+        });
 
         eigenschaftenAlphaThreeResponse = await fetch(
           API_ENDPOINTS.PROPERTIES.ALPHA_THREE,
@@ -157,7 +151,7 @@ const handleCodonInput = (value) => {
           body: JSON.stringify({ codons: cleanCodons, numOfCodons }),
         },
       );
-      
+
       const eigenschaftenAlphaOneResponse = await fetch(
         API_ENDPOINTS.PROPERTIES.ALPHA_ONE,
         {
@@ -169,16 +163,13 @@ const handleCodonInput = (value) => {
         },
       );
 
-      const c3Response = await fetch(
-        API_ENDPOINTS.PROPERTIES.C3,
-        {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify({ codons: cleanCodons, numOfCodons }),
+      const c3Response = await fetch(API_ENDPOINTS.PROPERTIES.C3, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
         },
-      );
+        body: JSON.stringify({ codons: cleanCodons, numOfCodons }),
+      });
 
       // Check responses based on what was fetched
       if (
@@ -194,12 +185,21 @@ const handleCodonInput = (value) => {
 
       const originalData = await originalResponse.json();
       const alphaOneData = await alphaOneResponse.json();
-      const alphaTwoData = alphaTwoResponse ? await alphaTwoResponse.json() : { nodes: [], edges: [] };
-      const alphaThreeData = alphaThreeResponse ? await alphaThreeResponse.json() : { nodes: [], edges: [] };
+      const alphaTwoData = alphaTwoResponse
+        ? await alphaTwoResponse.json()
+        : { nodes: [], edges: [] };
+      const alphaThreeData = alphaThreeResponse
+        ? await alphaThreeResponse.json()
+        : { nodes: [], edges: [] };
       const eigenschaftenData = await eigenschaftenResponse.json();
-      const eigenschaftenAlphaOneData = await eigenschaftenAlphaOneResponse.json();
-      const eigenschaftenAlphaTwoData = eigenschaftenAlphaTwoResponse ? await eigenschaftenAlphaTwoResponse.json() : {};
-      const eigenschaftenAlphaThreeData = eigenschaftenAlphaThreeResponse ? await eigenschaftenAlphaThreeResponse.json() : {};
+      const eigenschaftenAlphaOneData =
+        await eigenschaftenAlphaOneResponse.json();
+      const eigenschaftenAlphaTwoData = eigenschaftenAlphaTwoResponse
+        ? await eigenschaftenAlphaTwoResponse.json()
+        : {};
+      const eigenschaftenAlphaThreeData = eigenschaftenAlphaThreeResponse
+        ? await eigenschaftenAlphaThreeResponse.json()
+        : {};
       const c3Data = await c3Response.text(); // C3 response is a string (True/False)
 
       setOriginalCodons(originalData);
@@ -225,9 +225,7 @@ const handleCodonInput = (value) => {
     const reader = new FileReader();
     reader.onload = (event) => {
       const content = event.target.result;
-      const filteredContent = content
-        .toUpperCase()
-        .replace(/[^CGTA]/g, "");
+      const filteredContent = content.toUpperCase().replace(/[^CGTA]/g, "");
       setCodons(filteredContent);
     };
     reader.readAsText(file);
@@ -238,6 +236,7 @@ const handleCodonInput = (value) => {
       <h1 className="title">Codons Analysis</h1>
       <form className="codons-form" onSubmit={handleSubmit}>
         <h2 className="subtitle">User Input</h2>
+        <p>CGTTAATAGTGAAGCAGTTCATCCTCGTCTACAACCA</p>
         <div className="input-wrapper">
           <label htmlFor="codons">Codons</label>
           <input
@@ -257,14 +256,14 @@ const handleCodonInput = (value) => {
             min="2"
             max="4"
             onChange={(e) => {
-    const newValue = parseInt(e.target.value);
-    setNumOfCodons(newValue);
-    // Reformat existing codons with new number
-    if (codons) {
-      const formattedValue = formatCodonsInGroups(codons, newValue);
-      setCodons(formattedValue);
-    }
-  }}
+              const newValue = parseInt(e.target.value);
+              setNumOfCodons(newValue);
+              // Reformat existing codons with new number
+              if (codons) {
+                const formattedValue = formatCodonsInGroups(codons, newValue);
+                setCodons(formattedValue);
+              }
+            }}
           />
         </div>
 
