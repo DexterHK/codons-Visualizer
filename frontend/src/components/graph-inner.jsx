@@ -13,6 +13,8 @@ import {
   computeCircularLayout,
   computeColumnLayout,
   computeForceLayout,
+  computeAdvancedLayout,
+  computeGridLayout,
 } from "../utils/computeLayout";
 import { useResizeObserver } from "../hooks/useResizeObserver";
 import { useEffect } from "react";
@@ -32,6 +34,7 @@ export default function GraphInner({
   initialEdges,
   layoutType,
   nodeColor,
+  longestPathSelections = [],
 }) {
   const graphWrapperRef = React.useRef(null);
   const size = useResizeObserver(graphWrapperRef);
@@ -65,7 +68,46 @@ export default function GraphInner({
     setSelectedNodeId(null);
   }, []);
 
+  // Effect to handle longest path highlighting
   useEffect(() => {
+    if (longestPathSelections.length > 0) {
+      setNodes((nds) =>
+        nds.map((node) => {
+          const isInLongestPath = longestPathSelections.includes(node.id);
+          return {
+            ...node,
+            style: {
+              ...node.style,
+              background: isInLongestPath ? "#FF6B6B" : nodeColor,
+              border: isInLongestPath ? "3px solid #FF1744" : "1px solid #666",
+              boxShadow: isInLongestPath ? "0 0 15px rgba(255, 107, 107, 0.6)" : "none",
+            },
+          };
+        }),
+      );
+
+      // Highlight edges that connect longest path nodes
+      setEdges((eds) =>
+        eds.map((edge) => {
+          const isLongestPathEdge = longestPathSelections.includes(edge.source) && 
+                                   longestPathSelections.includes(edge.target);
+          return {
+            ...edge,
+            style: {
+              ...edge.style,
+              stroke: isLongestPathEdge ? "#FF1744" : "#b1b1b7",
+              strokeWidth: isLongestPathEdge ? 3 : 1,
+            },
+            markerEnd: {
+              type: MarkerType.ArrowClosed,
+              color: isLongestPathEdge ? "#FF1744" : "#b1b1b7",
+            },
+          };
+        }),
+      );
+      return;
+    }
+
     if (!selectedNodeId) {
       setNodes((nds) =>
         nds.map((node) => ({
@@ -73,6 +115,7 @@ export default function GraphInner({
           style: {
             ...node.style,
             background: nodeColor,
+            border: "1px solid #666",
             boxShadow: "none",
           },
         })),
@@ -84,6 +127,7 @@ export default function GraphInner({
           style: {
             ...edge.style,
             stroke: "#b1b1b7",
+            strokeWidth: 1,
           },
           markerEnd: {
             type: MarkerType.ArrowClosed,
@@ -136,48 +180,82 @@ export default function GraphInner({
         };
       }),
     );
-  }, [selectedNodeId, initialEdges, setNodes, setEdges]);
+  }, [selectedNodeId, initialEdges, setNodes, setEdges, longestPathSelections, nodeColor]);
 
   useEffect(() => {
     if (!size.width || !size.height) return;
     if (!initialNodes || !initialEdges) return;
 
-    let layoutedNodes;
-    if (layoutType === "force") {
-      layoutedNodes = computeForceLayout(
-        initialNodes,
-        initialEdges,
-        size.width,
-        size.height,
-        nodeColor,
-      );
-    } else if (layoutType === "circular") {
-      layoutedNodes = computeCircularLayout(
-        initialNodes,
-        size.width,
-        size.height,
-        nodeColor,
-      );
-    } else {
-      layoutedNodes = computeColumnLayout(
-        initialNodes,
-        3,
-        size.width,
-        size.height,
-        nodeColor,
-      );
-    }
+    const applyLayoutAsync = async () => {
+      let layoutedNodes;
+      
+      // Handle basic layouts that don't need async processing
+      if (layoutType === "force") {
+        layoutedNodes = computeForceLayout(
+          initialNodes,
+          initialEdges,
+          size.width,
+          size.height,
+          nodeColor,
+        );
+      } else if (layoutType === "circular") {
+        layoutedNodes = computeCircularLayout(
+          initialNodes,
+          size.width,
+          size.height,
+          nodeColor,
+        );
+      } else if (layoutType === "grid") {
+        layoutedNodes = computeGridLayout(
+          initialNodes,
+          size.width,
+          size.height,
+          nodeColor,
+        );
+      } else if (layoutType === "columns") {
+        layoutedNodes = computeColumnLayout(
+          initialNodes,
+          3,
+          size.width,
+          size.height,
+          nodeColor,
+        );
+      } else {
+        // Handle advanced layouts (Dagre, ELK, D3-Hierarchy, etc.)
+        try {
+          layoutedNodes = await computeAdvancedLayout(
+            initialNodes,
+            initialEdges,
+            layoutType,
+            size.width,
+            size.height,
+            nodeColor,
+          );
+        } catch (error) {
+          console.warn(`Advanced layout ${layoutType} failed, using force layout:`, error);
+          layoutedNodes = computeForceLayout(
+            initialNodes,
+            initialEdges,
+            size.width,
+            size.height,
+            nodeColor,
+          );
+        }
+      }
 
-    const newEdges = initialEdges.map((e, i) => ({
-      id: `${e.source}-${e.target}-${i}`,
-      source: e.source,
-      target: e.target,
-      type: "floatingEdge",
-      markerEnd: { type: MarkerType.ArrowClosed },
-    }));
+      const newEdges = initialEdges.map((e, i) => ({
+        id: `${e.source}-${e.target}-${i}`,
+        source: e.source,
+        target: e.target,
+        type: "floatingEdge",
+        markerEnd: { type: MarkerType.ArrowClosed },
+      }));
 
-    setNodes(layoutedNodes);
-    setEdges(newEdges);
+      setNodes(layoutedNodes);
+      setEdges(newEdges);
+    };
+
+    applyLayoutAsync();
   }, [size, layoutType, initialNodes, initialEdges, setNodes, setEdges, nodeColor]);
 
   if (!nodes || !edges) return null;

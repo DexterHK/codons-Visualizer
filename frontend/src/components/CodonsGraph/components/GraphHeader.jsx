@@ -11,7 +11,9 @@ const GraphHeader = ({
   toggleTheme, 
   activeTab, 
   setActiveTab, 
-  numOfCodons 
+  numOfCodons,
+  showInteractiveControls,
+  setShowInteractiveControls
 }) => {
   return (
     <div className={`graphs-header ${isHeaderCollapsed ? 'collapsed' : ''}`}>
@@ -27,6 +29,13 @@ const GraphHeader = ({
               title={`Switch to ${theme === 'dark' ? 'light' : 'dark'} theme`}
             >
               <ThemeToggle isDark={theme === 'dark'} />
+            </button>
+            <button 
+              className="interactive-controls-button" 
+              onClick={() => setShowInteractiveControls(!showInteractiveControls)} 
+              title={showInteractiveControls ? 'Hide Interactive Controls' : 'Show Interactive Controls'}
+            >
+              {showInteractiveControls ? '◀' : '▶'} EDIT
             </button>
           </div>
           <GraphsTabs 

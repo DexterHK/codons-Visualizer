@@ -5,7 +5,7 @@ import {
   forceLink,
   forceCenter,
 } from "d3-force";
-import { data } from "react-router";
+import { applyLayout, sortNodes, calculateCentrality } from "./graphSorting";
 
 export function computeColumnLayout(
   nodes,
@@ -105,4 +105,77 @@ export function computeForceLayout(nodes, edges, width, height, nodeColor) {
   }));
 
   return newNodes;
+}
+
+/**
+ * Comprehensive layout function that supports all layout algorithms
+ */
+export async function computeAdvancedLayout(nodes, edges, layoutType, width, height, nodeColor) {
+  // Convert nodes to the format expected by graphSorting utilities
+  const graphNodes = nodes.map(node => ({
+    id: node.id,
+    label: node.data?.label || node.id,
+    position: { x: 0, y: 0 },
+    measured: { width: 100, height: 50 }
+  }));
+
+  const graphEdges = edges.map(edge => ({
+    source: edge.source,
+    target: edge.target
+  }));
+
+  try {
+    // Apply the layout using our comprehensive layout system
+    const layoutedNodes = await applyLayout(graphNodes, graphEdges, layoutType, {
+      centerX: width / 2,
+      centerY: height / 2,
+      spacing: Math.min(width, height) / 10,
+      radius: Math.min(width, height) / 4
+    });
+
+    // Convert back to React Flow format
+    return layoutedNodes.map(node => ({
+      id: node.id,
+      type: "graphNode",
+      data: { label: node.label },
+      style: {
+        background: nodeColor,
+        borderRadius: "50%",
+      },
+      position: node.position
+    }));
+  } catch (error) {
+    console.warn(`Layout ${layoutType} failed, falling back to force layout:`, error);
+    // Fallback to force layout if advanced layout fails
+    return computeForceLayout(nodes, edges, width, height, nodeColor);
+  }
+}
+
+/**
+ * Grid layout with better spacing
+ */
+export function computeGridLayout(nodes, width, height, nodeColor) {
+  const cols = Math.ceil(Math.sqrt(nodes.length));
+  const rows = Math.ceil(nodes.length / cols);
+  
+  const cellWidth = width / (cols + 1);
+  const cellHeight = height / (rows + 1);
+  
+  return nodes.map((node, index) => {
+    const row = Math.floor(index / cols);
+    const col = index % cols;
+    
+    return {
+      ...node,
+      type: "graphNode",
+      style: {
+        background: nodeColor,
+        borderRadius: "50%",
+      },
+      position: {
+        x: (col + 1) * cellWidth,
+        y: (row + 1) * cellHeight,
+      },
+    };
+  });
 }

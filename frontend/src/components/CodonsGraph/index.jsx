@@ -7,10 +7,10 @@ import { ExportService } from "./services/ExportService";
 import { LongestPathService } from "./services/LongestPathService";
 import { GraphUtils } from "./utils/GraphUtils";
 import GraphHeader from "./components/GraphHeader";
-import GraphFooter from "./components/GraphFooter";
 import SingleGraphTab from "./components/SingleGraphTab";
 import C3GraphTab from "./components/C3GraphTab";
 import GraphSidebar from "./components/GraphSidebar";
+import InteractiveControls from "../InteractiveControls";
 import "../../css/codons-graph.css";
 
 const CodonsGraph = () => {
@@ -23,6 +23,7 @@ const CodonsGraph = () => {
   const [showOrganizationControls, setShowOrganizationControls] = useState(false);
   const [activeTab, setActiveTab] = useState(0);
   const [layout, setLayout] = useState("circular2d");
+  const [currentLayout, setCurrentLayout] = useState("force");
   const [selections, setSelections] = useState([]);
   const [isSeparated, setIsSeparated] = useState(false);
   const [isOverlaid, setIsOverlaid] = useState(false);
@@ -30,6 +31,7 @@ const CodonsGraph = () => {
   const [enableOptimization, setEnableOptimization] = useState(false);
   const [isHeaderCollapsed, setIsHeaderCollapsed] = useState(false);
   const [isFooterCollapsed, setIsFooterCollapsed] = useState(false);
+  const [showInteractiveControls, setShowInteractiveControls] = useState(false);
 
   // Services
   const [graphMergeService, setGraphMergeService] = useState(null);
@@ -108,6 +110,7 @@ const CodonsGraph = () => {
   )) {
     return (
       <main>
+        <InteractiveControls />
         <p className="error-message">No Data Provided</p>
         <Link to="/" className="back-link">
           Go Back
@@ -133,7 +136,8 @@ const CodonsGraph = () => {
             graphData={graphData.originalCodons}
             suffix="o"
             color="#90C67C"
-            layout={layout}
+            layout={currentLayout}
+            longestPathSelections={selections}
           />
         </div>
       );
@@ -146,7 +150,8 @@ const CodonsGraph = () => {
             graphData={graphData.alphaOne}
             suffix="a1"
             color="#60B5FF"
-            layout={layout}
+            layout={currentLayout}
+            longestPathSelections={selections}
           />
         </div>
       );
@@ -159,7 +164,8 @@ const CodonsGraph = () => {
             graphData={graphData.alphaTwo}
             suffix="a2"
             color="#E78B48"
-            layout={layout}
+            layout={currentLayout}
+            longestPathSelections={selections}
           />
         </div>
       );
@@ -172,7 +178,8 @@ const CodonsGraph = () => {
             graphData={graphData.alphaThree}
             suffix="a3"
             color="#ff69b4"
-            layout={layout}
+            layout={currentLayout}
+            longestPathSelections={selections}
           />
         </div>
       );
@@ -191,7 +198,7 @@ const CodonsGraph = () => {
           setIsSeparated={setIsSeparated}
           setIsOverlaid={setIsOverlaid}
           setSelections={setSelections}
-          layout={layout}
+          layout={currentLayout}
           selections={selections}
           mergedGraph={mergedGraph}
         />
@@ -212,19 +219,18 @@ const CodonsGraph = () => {
         activeTab={activeTab}
         setActiveTab={setActiveTab}
         numOfCodons={graphData.numOfCodons}
+        showInteractiveControls={showInteractiveControls}
+        setShowInteractiveControls={setShowInteractiveControls}
       />
+      
+      {showInteractiveControls && (
+        <InteractiveControls isDropdown={true} />
+      )}
       
       <div className="graphs-content">
         {renderTabContent()}
       </div>
       
-      <GraphFooter
-        isFooterCollapsed={isFooterCollapsed}
-        setIsFooterCollapsed={setIsFooterCollapsed}
-        toggleLongestPath={toggleLongestPath}
-        setLayout={setLayout}
-        layout={layout}
-      />
       
       <GraphSidebar
         showOrganizationControls={showOrganizationControls}
@@ -233,6 +239,8 @@ const CodonsGraph = () => {
         setNodeSortType={setNodeSortType}
         enableOptimization={enableOptimization}
         setEnableOptimization={setEnableOptimization}
+        currentLayout={currentLayout}
+        setCurrentLayout={setCurrentLayout}
         showProperties={showProperties}
         setShowProperites={setShowProperites}
         eigenschaften={graphData.eigenschaften}
@@ -242,6 +250,7 @@ const CodonsGraph = () => {
         c3={graphData.c3}
         numOfCodons={graphData.numOfCodons}
         activeTab={activeTab}
+        toggleLongestPath={toggleLongestPath}
       />
     </main>
   );

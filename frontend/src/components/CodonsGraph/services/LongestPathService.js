@@ -4,7 +4,7 @@ export class LongestPathService {
   static async fetchLongestPath(activeTab, numOfCodons, originalCodons, alphaOne, alphaTwo, alphaThree) {
     const c3TabIndex = this.getC3TabIndex(numOfCodons);
     
-    // Calculate longest path using original codons for all tabs
+    // Use the appropriate graph data based on the active tab
     const calculationGraph = activeTab === c3TabIndex ? originalCodons : 
                            activeTab === 0 ? originalCodons : 
                            activeTab === 1 ? alphaOne : 
@@ -14,10 +14,19 @@ export class LongestPathService {
       throw new Error("Invalid graph data");
     }
 
+    // Convert edges to the format expected by the backend
+    const edgesData = calculationGraph.edges.map(edge => ({
+      source: edge.source,
+      target: edge.target
+    }));
+
     const requestData = {
-      codons: calculationGraph.edges,
-      numOfCodons: calculationGraph.nodes.length,
+      edges: edgesData,
+      nodes: calculationGraph.nodes,
+      numOfCodons: numOfCodons
     };
+
+    console.log("Sending longest path request:", requestData);
 
     const response = await fetch(API_ENDPOINTS.GRAPHS.LONGEST_PATH, {
       method: "POST",
@@ -28,11 +37,12 @@ export class LongestPathService {
     });
 
     if (!response.ok) {
-      const errorData = await response.json();
-      throw new Error(`Failed to fetch longest path: ${response.status} ${JSON.stringify(errorData)}`);
+      const errorText = await response.text();
+      throw new Error(`Failed to fetch longest path: ${response.status} ${errorText}`);
     }
 
     const longestPath = await response.json();
+    console.log("Received longest path:", longestPath);
 
     if (!Array.isArray(longestPath)) {
       throw new Error("Invalid response format, expected array");

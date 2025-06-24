@@ -10,6 +10,8 @@ const GraphSidebar = ({
   setNodeSortType,
   enableOptimization,
   setEnableOptimization,
+  currentLayout,
+  setCurrentLayout,
   showProperties,
   setShowProperites,
   eigenschaften,
@@ -19,7 +21,14 @@ const GraphSidebar = ({
   c3,
   numOfCodons,
   activeTab,
+  toggleLongestPath,
 }) => {
+  const handleLayoutChange = (layoutType) => {
+    if (setCurrentLayout) {
+      setCurrentLayout(layoutType);
+    }
+  };
+
   return (
     <>
       <div
@@ -28,8 +37,11 @@ const GraphSidebar = ({
         <GraphSortingControls
           onNodeSortChange={setNodeSortType}
           onLayoutOptimize={() => setEnableOptimization(!enableOptimization)}
+          onLayoutChange={handleLayoutChange}
           nodeSortType={nodeSortType}
           isOptimized={enableOptimization}
+          currentLayout={currentLayout || 'force'}
+          toggleLongestPath={toggleLongestPath}
         />
       </div>
 

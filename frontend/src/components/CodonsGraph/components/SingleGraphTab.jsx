@@ -7,6 +7,7 @@ const SingleGraphTab = ({
   suffix, 
   color, 
   layout, 
+  longestPathSelections = []
 }) => {
   if (!graphData || !graphData.nodes || !graphData.edges) {
     return null;
@@ -21,6 +22,7 @@ const SingleGraphTab = ({
       initialEdges={edges}
       layoutType={layout}
       nodeColor={color}
+      longestPathSelections={longestPathSelections}
     />
   );
 };
