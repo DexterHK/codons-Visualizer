@@ -167,6 +167,7 @@ const C3GraphTab = ({
             initialEdges={originalEdges}
             layoutType={layout}
             nodeColor="#90C67C"
+            edgeColor="#6B8E5A"
           />
         </div>
       </div>
@@ -178,6 +179,7 @@ const C3GraphTab = ({
             initialEdges={alphaOneEdges}
             layoutType={layout}
             nodeColor="#60B5FF"
+            edgeColor="#4A8FCC"
           />
         </div>
       </div>
@@ -190,6 +192,7 @@ const C3GraphTab = ({
               initialEdges={alphaTwoEdges}
               layoutType={layout}
               nodeColor="#f9844a"
+              edgeColor="#C6693B"
             />
           </div>
         </div>
@@ -203,6 +206,7 @@ const C3GraphTab = ({
               initialEdges={alphaThreeEdges}
               layoutType={layout}
               nodeColor="#ff6b9d"
+              edgeColor="#CC557E"
             />
           </div>
         </div>

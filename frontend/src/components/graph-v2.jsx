@@ -2,7 +2,7 @@ import React from "react";
 import { useResizeObserver } from "../hooks/useResizeObserver";
 import GraphInner from "./graph-inner";
 
-export default function GraphV2({ initialNodes, initialEdges, layoutType, nodeColor, longestPathSelections }) {
+export default function GraphV2({ initialNodes, initialEdges, layoutType, nodeColor, edgeColor, longestPathSelections }) {
   const graphWrapperRef = React.useRef(null);
   const size = useResizeObserver(graphWrapperRef);
 
@@ -11,6 +11,7 @@ export default function GraphV2({ initialNodes, initialEdges, layoutType, nodeCo
       <GraphInner
         size={size}
         nodeColor={nodeColor}
+        edgeColor={edgeColor}
         initialNodes={initialNodes}
         initialEdges={initialEdges}
         layoutType={layoutType}

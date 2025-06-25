@@ -19,6 +19,7 @@ import {
 import { useResizeObserver } from "../hooks/useResizeObserver";
 import { useEffect } from "react";
 import FloatingEdge from "./floating-edge";
+import SelfLoopEdge from "./self-loop-edge";
 import FloatingConnectionLine from "./floating-connection-line";
 
 const nodeTypes = {
@@ -27,6 +28,7 @@ const nodeTypes = {
 
 const edgeTypes = {
   floatingEdge: FloatingEdge,
+  selfLoopEdge: SelfLoopEdge,
 };
 
 export default function GraphInner({
@@ -34,6 +36,7 @@ export default function GraphInner({
   initialEdges,
   layoutType,
   nodeColor,
+  edgeColor = "#b1b1b7", // Default edge color
   longestPathSelections = [],
 }) {
   const graphWrapperRef = React.useRef(null);
@@ -50,7 +53,7 @@ export default function GraphInner({
         addEdge(
           {
             ...params,
-            type: "floatingEdge",
+            type: params.source === params.target ? "selfLoopEdge" : "floatingEdge",
             markerEnd: { type: MarkerType.Arrow },
           },
           eds,
@@ -95,12 +98,12 @@ export default function GraphInner({
             ...edge,
             style: {
               ...edge.style,
-              stroke: isLongestPathEdge ? "#FF1744" : "#b1b1b7",
+              stroke: isLongestPathEdge ? "#FF1744" : edgeColor,
               strokeWidth: isLongestPathEdge ? 3 : 1,
             },
             markerEnd: {
               type: MarkerType.ArrowClosed,
-              color: isLongestPathEdge ? "#FF1744" : "#b1b1b7",
+              color: isLongestPathEdge ? "#FF1744" : edgeColor,
             },
           };
         }),
@@ -126,12 +129,12 @@ export default function GraphInner({
           ...edge,
           style: {
             ...edge.style,
-            stroke: "#b1b1b7",
+            stroke: edgeColor,
             strokeWidth: 1,
           },
           markerEnd: {
             type: MarkerType.ArrowClosed,
-            color: "#b1b1b7",
+            color: edgeColor,
           },
         })),
       );
@@ -260,7 +263,7 @@ export default function GraphInner({
         id: `${e.source}-${e.target}-${i}`,
         source: e.source,
         target: e.target,
-        type: "floatingEdge",
+        type: e.source === e.target ? "selfLoopEdge" : "floatingEdge",
         markerEnd: { type: MarkerType.ArrowClosed },
       }));
 

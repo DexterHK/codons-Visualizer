@@ -406,6 +406,7 @@ export default function OverlayGraphs({
             initialEdges={originalEdges}
             layoutType={consistentPositioning ? "preset" : layout}
             nodeColor="#90C67C"
+            edgeColor="#6B8E5A"
           />
         </div>
 
@@ -421,6 +422,7 @@ export default function OverlayGraphs({
             initialEdges={alphaOneEdges}
             layoutType={consistentPositioning ? "preset" : layout}
             nodeColor="#60B5FF"
+            edgeColor="#4A8FCC"
           />
         </div>
 
@@ -437,6 +439,7 @@ export default function OverlayGraphs({
               initialEdges={alphaTwoEdges}
               layoutType={consistentPositioning ? "preset" : layout}
               nodeColor="#E78B48"
+              edgeColor="#B86F39"
             />
           </div>
         )}
@@ -454,6 +457,7 @@ export default function OverlayGraphs({
               initialEdges={alphaThreeEdges}
               layoutType={consistentPositioning ? "preset" : layout}
               nodeColor="#ff69b4"
+              edgeColor="#CC5490"
             />
           </div>
         )}

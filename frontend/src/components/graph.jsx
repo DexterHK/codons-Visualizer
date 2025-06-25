@@ -136,17 +136,26 @@ export default function Graph({
     };
   }, [theme, isC3Tab]);
 
-  // Process edges to ensure proper coloring for C3 tab
+  // Process edges to ensure proper coloring for C3 tab and handle self-loops
   const finalProcessedEdges = React.useMemo(() => {
-    if (!isC3Tab) return edges;
+    if (!edges) return edges;
 
-    return edges.map((edge) => ({
-      ...edge,
-      // Use the stroke color from the edge data if available
-      color: edge.stroke || (theme === "dark" ? "#666" : "#999"),
-      width: edge.strokeWidth || 1,
-    }));
-  }, [edges, isC3Tab, theme]);
+    return edges.map((edge) => {
+      const isSelfLoop = edge.source === edge.target;
+      
+      return {
+        ...edge,
+        // Use the stroke color from the edge data if available
+        color: edge.stroke || (theme === "dark" ? "#666" : "#999"),
+        width: edge.strokeWidth || 1,
+        // For self-loops, add a curved path to make them visible
+        ...(isSelfLoop && {
+          curved: true,
+          curvature: 0.8, // High curvature for self-loops
+        }),
+      };
+    });
+  }, [edges, theme]);
 
   return (
     <GraphCanvas
