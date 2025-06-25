@@ -189,8 +189,21 @@ export default function GraphInner({
     const applyLayoutAsync = async () => {
       let layoutedNodes;
       
+      // Handle preset layout (nodes already have positions)
+      if (layoutType === "preset") {
+        layoutedNodes = initialNodes.map(node => ({
+          ...node,
+          type: "graphNode",
+          style: {
+            background: nodeColor,
+            borderRadius: "50%",
+            ...node.style,
+          },
+          position: node.position || { x: 0, y: 0 }
+        }));
+      }
       // Handle basic layouts that don't need async processing
-      if (layoutType === "force") {
+      else if (layoutType === "force") {
         layoutedNodes = computeForceLayout(
           initialNodes,
           initialEdges,

@@ -3,6 +3,7 @@ import "./styles.css";
 import GraphV2 from "../graph-v2";
 import { usePressedKey } from "../../hooks/usePressedKey";
 import { useEffect } from "react";
+import { createConsistentLayout, applyConsistentPositions } from "../../utils/consistentLayout";
 
 export default function OverlayGraphs({
   originalNodes,
@@ -28,6 +29,14 @@ export default function OverlayGraphs({
     alphaOne: 1,
     alphaTwo: 1,
     alphaThree: 1,
+  });
+
+  const [consistentPositioning, setConsistentPositioning] = useState(true);
+  const [positionedNodes, setPositionedNodes] = useState({
+    original: null,
+    alphaOne: null,
+    alphaTwo: null,
+    alphaThree: null,
   });
 
   const pressedKey = usePressedKey(["z", "x", "c", "v"]);
@@ -76,6 +85,86 @@ export default function OverlayGraphs({
       setGraphZIndex(prevZIndexsState);
     }
   }, [pressedKey]);
+
+  // Effect to compute consistent positions when nodes change or positioning settings change
+  useEffect(() => {
+    if (!consistentPositioning) {
+      // Reset to original nodes if consistent positioning is disabled
+      setPositionedNodes({
+        original: originalNodes,
+        alphaOne: alphaOneNodes,
+        alphaTwo: alphaTwoNodes,
+        alphaThree: alphaThreeNodes,
+      });
+      return;
+    }
+
+    // Collect all graph nodes for analysis
+    const allGraphNodes = [
+      originalNodes,
+      alphaOneNodes,
+      alphaTwoNodes,
+      alphaThreeNodes,
+    ].filter(Boolean);
+
+    if (allGraphNodes.length === 0) return;
+
+    // Assume a standard canvas size for positioning (will be scaled by GraphV2)
+    const canvasWidth = 800;
+    const canvasHeight = 600;
+
+    // Create consistent layout
+    const positionMap = createConsistentLayout({
+      allGraphNodes,
+      width: canvasWidth,
+      height: canvasHeight,
+    });
+
+    // Apply consistent positions to each graph
+    const newPositionedNodes = {
+      original: originalNodes ? applyConsistentPositions(
+        originalNodes,
+        positionMap,
+        "#90C67C",
+        layout,
+        canvasWidth,
+        canvasHeight
+      ) : null,
+      alphaOne: alphaOneNodes ? applyConsistentPositions(
+        alphaOneNodes,
+        positionMap,
+        "#60B5FF",
+        layout,
+        canvasWidth,
+        canvasHeight
+      ) : null,
+      alphaTwo: alphaTwoNodes ? applyConsistentPositions(
+        alphaTwoNodes,
+        positionMap,
+        "#E78B48",
+        layout,
+        canvasWidth,
+        canvasHeight
+      ) : null,
+      alphaThree: alphaThreeNodes ? applyConsistentPositions(
+        alphaThreeNodes,
+        positionMap,
+        "#ff69b4",
+        layout,
+        canvasWidth,
+        canvasHeight
+      ) : null,
+    };
+
+    setPositionedNodes(newPositionedNodes);
+  }, [
+    originalNodes,
+    alphaOneNodes,
+    alphaTwoNodes,
+    alphaThreeNodes,
+    consistentPositioning,
+    layout,
+  ]);
 
   // Generate preset buttons based on available graphs
   const generatePresetButtons = () => {
@@ -183,6 +272,30 @@ export default function OverlayGraphs({
     <div className="overlay-container">
       <div className="overlay-controls">
         <h4>Graph Controls</h4>
+        
+        {/* Consistent Positioning Controls */}
+        <div className="positioning-controls">
+          <h5>Node Positioning</h5>
+          <div className="positioning-options">
+            <label className="checkbox-label">
+              <input
+                type="checkbox"
+                checked={consistentPositioning}
+                onChange={(e) => setConsistentPositioning(e.target.checked)}
+              />
+              <span>Consistent Node Positioning</span>
+            </label>
+            
+            {consistentPositioning && (
+              <div className="positioning-method">
+                <span style={{ fontSize: '0.85rem', color: '#cccccc' }}>
+                  Using dynamic analysis to position nodes with the same sequence in identical locations across all graphs.
+                </span>
+              </div>
+            )}
+          </div>
+        </div>
+        
         <div className="control-group">
           <label>
             <span style={{ color: "#90C67C" }}>Original Graph</span>
@@ -289,9 +402,9 @@ export default function OverlayGraphs({
           }}
         >
           <GraphV2
-            initialNodes={originalNodes}
+            initialNodes={consistentPositioning ? positionedNodes.original : originalNodes}
             initialEdges={originalEdges}
-            layoutType={layout}
+            layoutType={consistentPositioning ? "preset" : layout}
             nodeColor="#90C67C"
           />
         </div>
@@ -304,9 +417,9 @@ export default function OverlayGraphs({
           }}
         >
           <GraphV2
-            initialNodes={alphaOneNodes}
+            initialNodes={consistentPositioning ? positionedNodes.alphaOne : alphaOneNodes}
             initialEdges={alphaOneEdges}
-            layoutType={layout}
+            layoutType={consistentPositioning ? "preset" : layout}
             nodeColor="#60B5FF"
           />
         </div>
@@ -320,9 +433,9 @@ export default function OverlayGraphs({
             }}
           >
             <GraphV2
-              initialNodes={alphaTwoNodes}
+              initialNodes={consistentPositioning ? positionedNodes.alphaTwo : alphaTwoNodes}
               initialEdges={alphaTwoEdges}
-              layoutType={layout}
+              layoutType={consistentPositioning ? "preset" : layout}
               nodeColor="#E78B48"
             />
           </div>
@@ -337,9 +450,9 @@ export default function OverlayGraphs({
             }}
           >
             <GraphV2
-              initialNodes={alphaThreeNodes}
+              initialNodes={consistentPositioning ? positionedNodes.alphaThree : alphaThreeNodes}
               initialEdges={alphaThreeEdges}
-              layoutType={layout}
+              layoutType={consistentPositioning ? "preset" : layout}
               nodeColor="#ff69b4"
             />
           </div>

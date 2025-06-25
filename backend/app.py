@@ -13,6 +13,7 @@ def create_app():
             "origins": [
                 # Development origins
                 "http://localhost:8080", "http://127.0.0.1:8080", "http://0.0.0.0:8080",
+                "http://localhost:8081", "http://127.0.0.1:8081", "http://0.0.0.0:8081",
                 "http://localhost:5000", "http://127.0.0.1:5000", "http://0.0.0.0:5000",
                 "http://localhost:3000", "http://127.0.0.1:3000",
                 # Production origins - Domain
