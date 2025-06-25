@@ -50,18 +50,6 @@ export default function GraphProperties({
     );
   };
 
-  // Function to render C3 section (always visible)
-  const renderC3Section = () => (
-    <div>
-      <h2>C{numOfCodons}:</h2>
-      <div className="properties">
-        <p className={`property ${c3 && "check"}`}>
-          <span>C{numOfCodons}</span>
-          {c3 ? <Check /> : <Unchecked />}
-        </p>
-      </div>
-    </div>
-  );
 
   return (
     <>
@@ -85,8 +73,6 @@ export default function GraphProperties({
           </>
         )}
 
-        {/* C3 section is always visible */}
-        {renderC3Section()}
       </aside>
       <button
         type="button"

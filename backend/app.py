@@ -15,9 +15,14 @@ def create_app():
                 "http://localhost:8080", "http://127.0.0.1:8080", "http://0.0.0.0:8080",
                 "http://localhost:5000", "http://127.0.0.1:5000", "http://0.0.0.0:5000",
                 "http://localhost:3000", "http://127.0.0.1:3000",
-                # Production origins
+                # Production origins - Domain
                 "http://gcat.app", "https://gcat.app",
+                "http://gcat.app:5000", "https://gcat.app:5000",
+                "http://gcat.app:8080", "https://gcat.app:8080",
+                "http://gcat.app:3000", "https://gcat.app:3000",
+                # Production origins - IP
                 "http://139.59.213.46", "https://139.59.213.46",
+                "http://139.59.213.46:5000", "https://139.59.213.46:5000",
                 "http://139.59.213.46:8080", "https://139.59.213.46:8080",
                 "http://139.59.213.46:3000", "https://139.59.213.46:3000"
             ],

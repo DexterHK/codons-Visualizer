@@ -5,11 +5,16 @@ const getApiBaseUrl = () => {
     return 'http://localhost:5000';
   }
   
-  // For production, use the same host but port 5000
+  // For production, check if we're accessing via domain name or IP
   const protocol = window.location.protocol;
   const hostname = window.location.hostname;
   
-  // If accessing via domain (gcat.app) or IP, use that host with port 5000
+  // If accessing via domain (gcat.app), use Nginx proxy (no port needed)
+  if (hostname === 'gcat.app') {
+    return `${protocol}//${hostname}`;
+  }
+  
+  // If accessing via IP, use direct backend port
   return `${protocol}//${hostname}:5000`;
 };
 
