@@ -51,7 +51,16 @@ const FlowGraph = () => {
     }));
   };
 
-
+  if (!hasRequiredData()) {
+    return (
+      <main>
+        <p className="error-message">No Data Provided</p>
+        <Link to="/" className="back-link">
+          Go Back
+        </Link>
+      </main>
+    );
+  }
 
   return (
     <ReactFlowProvider>
