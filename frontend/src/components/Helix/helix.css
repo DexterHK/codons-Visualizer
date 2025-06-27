@@ -1,0 +1,150 @@
+.dna-container {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 60%;
+  height: 100%;
+  perspective: 1000px;
+  overflow: hidden;
+  z-index: -1;
+}
+
+.dna-helix {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 300px;
+  height: 600px;
+  transform: translate(-50%, -50%);
+  transform-style: preserve-3d;
+  animation: rotateHelix 20s linear infinite;
+}
+
+.dna-segment {
+  position: absolute;
+  width: 100%;
+  height: 20px;
+  top: calc(var(--segment) * 20px);
+  transform-style: preserve-3d;
+  transform: rotateY(calc(var(--segment) * 24deg));
+}
+
+.base-pair {
+  position: absolute;
+  width: 100%;
+  height: 4px;
+  top: 50%;
+  transform: translateY(-50%);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.base {
+  width: 20px;
+  height: 8px;
+  border-radius: 6px;
+  animation: glow 3s ease-in-out infinite alternate;
+}
+
+.base-left {
+  background: linear-gradient(45deg, #646cff, #8b93ff);
+  box-shadow: 0 0 10px rgba(100, 108, 255, 0.6);
+}
+
+.base-right {
+  background: linear-gradient(45deg, #a5b4fc, #c7d2fe);
+  box-shadow: 0 0 10px rgba(165, 180, 252, 0.6);
+}
+
+.connector {
+  flex: 1;
+  height: 2px;
+  background: linear-gradient(
+    90deg,
+    rgba(100, 108, 255, 0.8) 0%,
+    rgba(255, 255, 255, 0.3) 50%,
+    rgba(165, 180, 252, 0.8) 100%
+  );
+  margin: 0 10px;
+  border-radius: 1px;
+}
+
+.backbone {
+  position: absolute;
+  width: 8px;
+  height: 30px;
+  background: linear-gradient(
+    180deg,
+    rgba(100, 108, 255, 0.9) 0%,
+    rgba(139, 147, 255, 0.7) 50%,
+    rgba(100, 108, 255, 0.9) 100%
+  );
+  border-radius: 8px;
+  top: -5px;
+  box-shadow: 0 0 8px rgba(100, 108, 255, 0.5);
+}
+
+.backbone-left {
+  left: -10px;
+  transform: rotateZ(-15deg);
+}
+
+.backbone-right {
+  right: -10px;
+  transform: rotateZ(15deg);
+}
+
+@keyframes rotateHelix {
+  0% {
+    transform: translate(-50%, -50%) rotateY(0deg) rotateX(10deg);
+  }
+  100% {
+    transform: translate(-50%, -50%) rotateY(360deg) rotateX(10deg);
+  }
+}
+
+@keyframes glow {
+  0% {
+    box-shadow:
+      0 0 5px #1a1a1a,
+      0 0 10px #1a1a1a,
+      0 0 15px #1a1a1a;
+  }
+  100% {
+    box-shadow:
+      0 0 10px #1a1a1a,
+      0 0 20px #1a1a1a,
+      0 0 30px #1a1a1a;
+  }
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+  .dna-helix {
+    width: 200px;
+    height: 400px;
+  }
+
+  .dna-segment {
+    height: 15px;
+    top: calc(var(--segment) * 15px);
+  }
+}
+
+@media (max-width: 480px) {
+  .dna-helix {
+    width: 150px;
+    height: 300px;
+  }
+
+  .base {
+    width: 15px;
+    height: 6px;
+  }
+
+  .backbone {
+    width: 6px;
+    height: 25px;
+  }
+}

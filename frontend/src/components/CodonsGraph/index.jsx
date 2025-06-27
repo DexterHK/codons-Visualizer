@@ -109,12 +109,22 @@ const CodonsGraph = () => {
     graphData.alphaThree
   )) {
     return (
-      <main>
-        <InteractiveControls />
-        <p className="error-message">No Data Provided</p>
-        <Link to="/" className="back-link">
-          Go Back
-        </Link>
+      <main className="graphs-wrapper">
+        <div className="graphs-content">
+          <div style={{ 
+            display: 'flex', 
+            flexDirection: 'column', 
+            alignItems: 'center', 
+            justifyContent: 'center', 
+            height: '100%',
+            gap: '2rem'
+          }}>
+            <p className="error-message">No Data Provided</p>
+            <Link to="/" className="back-link">
+              Go Back
+            </Link>
+          </div>
+        </div>
       </main>
     );
   }

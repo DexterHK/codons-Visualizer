@@ -5,6 +5,8 @@ import { useNavigate } from "react-router";
 import { useStore } from "../store";
 import FlowGraph from "../components/graph-v2";
 import { API_ENDPOINTS } from "../config/api";
+import Helix from "../components/Helix";
+import { Dna, ChevronRight } from "lucide-react";
 
 export default function Home() {
   const codons = useStore((state) => state.codons);
@@ -232,55 +234,27 @@ export default function Home() {
   };
 
   return (
-    <main>
-      <h1 className="title">Codons Analysis</h1>
-      <form className="codons-form" onSubmit={handleSubmit}>
-        <h2 className="subtitle">User Input</h2>
-        <p>CGTTAATAGTGAAGCAGTTCATCCTCGTCTACAACCA</p>
-        <div className="input-wrapper">
-          <label htmlFor="codons">Codons</label>
-          <input
-            id="codons"
-            type="text"
-            value={codons}
-            onChange={(e) => handleCodonInput(e.target.value)}
-            placeholder="Only letters C, G, T, and A are allowed"
-          />
+    <main className="home-main home-container">
+      <Helix />
+      <div className="hero">
+        <div className="title-wrapper">
+          <Dna size={64} color="#646cff" />
+          <h1 className="title">
+            Codon<span className="gradient-text">Analysis</span>
+          </h1>
         </div>
-
-        <div className="input-wrapper">
-          <label htmlFor="num-of-codons">Number of Codons</label>
-          <input
-            id="num-of-codons"
-            type="number"
-            min="2"
-            max="4"
-            onChange={(e) => {
-              const newValue = parseInt(e.target.value);
-              setNumOfCodons(newValue);
-              // Reformat existing codons with new number
-              if (codons) {
-                const formattedValue = formatCodonsInGroups(codons, newValue);
-                setCodons(formattedValue);
-              }
-            }}
-          />
-        </div>
-
-        <div className="input-wrapper">
-          <label htmlFor="file-import">Import CSV or TXT</label>
-          <input
-            id="file-import"
-            type="file"
-            accept=".csv, .txt"
-            onChange={handleFileImport}
-          />
-        </div>
-
-        <button className="submit-button" type="submit" disabled={isPending}>
-          Submit
+        <p className="desc">
+          Analyze DNA sequences by identifying and translating codons into amino
+          acids.
+        </p>
+      </div>
+      <div>
+        <button className="visualizer-btn" onClick={() => navigate("/codons")}>
+          <span>Start Analysis</span>
+          <ChevronRight className="cta-icon" />
         </button>
-      </form>
+      </div>
+
     </main>
   );
 }
