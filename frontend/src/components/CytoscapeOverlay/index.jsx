@@ -1,6 +1,7 @@
 import React, { useEffect, useRef, useState } from 'react';
 import cytoscape from 'cytoscape';
 import coseBilkent from 'cytoscape-cose-bilkent';
+import { createConsistentLayout } from '../../utils/consistentLayout';
 import './styles.css';
 
 // Register the layout extension
@@ -34,6 +35,8 @@ export default function CytoscapeOverlay({
     zoom: 1,
     pan: { x: 0, y: 0 }
   });
+
+  const [consistentPositioning, setConsistentPositioning] = useState(true);
 
   useEffect(() => {
     if (!containerRef.current) return;
@@ -146,9 +149,8 @@ export default function CytoscapeOverlay({
     const cy = cyRef.current;
     cy.elements().remove();
 
-    const elements = [];
-
-    // Add nodes and edges for each graph
+    // Collect all graph nodes for consistent positioning
+    const allGraphNodes = [];
     const graphs = [
       { data: originalCodons, type: 'original', color: '#90C67C', opacity: graphOpacity.original },
       { data: alphaOne, type: 'alphaOne', color: '#60B5FF', opacity: graphOpacity.alphaOne },
@@ -162,13 +164,42 @@ export default function CytoscapeOverlay({
       graphs.push({ data: alphaThree, type: 'alphaThree', color: '#ff69b4', opacity: graphOpacity.alphaThree });
     }
 
+    let positionMap = {};
+    
+    // Create consistent position map only if consistent positioning is enabled
+    if (consistentPositioning) {
+      // Collect all unique nodes from all graphs for consistent positioning
+      graphs.forEach(({ data }) => {
+        if (data && data.nodes) {
+          allGraphNodes.push(data.nodes);
+        }
+      });
+
+      const canvasWidth = containerRef.current ? containerRef.current.clientWidth : 800;
+      const canvasHeight = containerRef.current ? containerRef.current.clientHeight : 600;
+      positionMap = createConsistentLayout({
+        allGraphNodes,
+        width: canvasWidth,
+        height: canvasHeight,
+      });
+    }
+
+    const elements = [];
+
     graphs.forEach(({ data, type, color, opacity }) => {
       if (!data || !data.nodes || !data.edges) return;
 
-      // Add nodes
+      // Add nodes with consistent positioning
       data.nodes.forEach(node => {
         const nodeId = `${node}_${type}`;
+        const consistentPosition = consistentPositioning ? positionMap[node] : null;
         const savedPosition = graphPositions[type][nodeId];
+        
+        // Use saved position if available, otherwise use consistent position if enabled
+        const finalPosition = savedPosition || (consistentPosition ? {
+          x: Math.round(consistentPosition.x),
+          y: Math.round(consistentPosition.y)
+        } : undefined);
         
         elements.push({
           data: {
@@ -179,7 +210,7 @@ export default function CytoscapeOverlay({
             graphType: type,
             zIndex: type === 'original' ? 4 : type === 'alphaOne' ? 3 : type === 'alphaTwo' ? 2 : 1
           },
-          position: savedPosition || undefined
+          position: finalPosition
         });
       });
 
@@ -201,9 +232,11 @@ export default function CytoscapeOverlay({
 
     cy.add(elements);
 
-    // Apply layout only if no saved positions exist
-    const hasPositions = Object.values(graphPositions).some(positions => Object.keys(positions).length > 0);
-    if (!hasPositions) {
+    // Apply layout only if no consistent positions and no saved positions exist
+    const hasConsistentPositions = consistentPositioning && Object.keys(positionMap).length > 0;
+    const hasSavedPositions = Object.values(graphPositions).some(positions => Object.keys(positions).length > 0);
+    
+    if (!hasConsistentPositions && !hasSavedPositions) {
       cy.layout({
         name: 'cose-bilkent',
         animate: true,
@@ -219,7 +252,7 @@ export default function CytoscapeOverlay({
     cy.zoom(viewState.zoom);
     cy.pan(viewState.pan);
 
-  }, [originalCodons, alphaOne, alphaTwo, alphaThree, numOfCodons, graphPositions]);
+  }, [originalCodons, alphaOne, alphaTwo, alphaThree, numOfCodons, graphPositions, consistentPositioning]);
 
   const handleOpacityChange = (graph, value) => {
     const newOpacity = parseFloat(value);
@@ -396,6 +429,29 @@ export default function CytoscapeOverlay({
           <p><strong>Left Click:</strong> Drag nodes to reposition</p>
           <p><strong>Right Click:</strong> Center view on node</p>
           <p><strong>Mouse Wheel:</strong> Zoom in/out</p>
+        </div>
+        
+        {/* Consistent Positioning Controls */}
+        <div className="positioning-controls">
+          <h5>Node Positioning</h5>
+          <div className="positioning-options">
+            <label className="checkbox-label">
+              <input
+                type="checkbox"
+                checked={consistentPositioning}
+                onChange={(e) => setConsistentPositioning(e.target.checked)}
+              />
+              <span>Consistent Node Positioning</span>
+            </label>
+            
+            {consistentPositioning && (
+              <div className="positioning-method">
+                <span style={{ fontSize: '0.85rem', color: '#cccccc' }}>
+                  Nodes with the same sequence are positioned identically across all graphs for perfect overlay alignment.
+                </span>
+              </div>
+            )}
+          </div>
         </div>
         
         <div className="control-group">

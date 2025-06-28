@@ -426,7 +426,7 @@ export default function OverlayGraphs({
           />
         </div>
 
-        {numOfCodons >= 3 && alphaOneNodes && (
+        {numOfCodons >= 3 && alphaTwoNodes && (
           <div
             className="overlay-graph-layer"
             style={{

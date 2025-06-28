@@ -15,14 +15,24 @@ export function generateDynamicPositions(allGraphNodes, width, height) {
   const positionMap = {};
   const allUniqueNodes = new Set();
   
-  // Collect all unique node IDs from all graphs using the same logic as applyConsistentPositions
+  // Collect all unique base sequences from all graphs
   allGraphNodes.forEach(graphNodes => {
     if (graphNodes) {
       graphNodes.forEach(node => {
-        // Use the same robust node ID extraction as in applyConsistentPositions
-        const nodeId = node.id || node.data?.label || node.label || node.data?.id;
-        if (nodeId) {
-          allUniqueNodes.add(nodeId);
+        // Extract the base sequence from the node - same logic as applyConsistentPositions
+        let baseSequence = null;
+        
+        if (node.data?.label) {
+          baseSequence = node.data.label;
+        } else if (node.id) {
+          // Remove suffix (o, a1, a2, a3) to get base sequence
+          baseSequence = node.id.replace(/[oa]\d*$/, '');
+        } else if (node.label) {
+          baseSequence = node.label;
+        }
+        
+        if (baseSequence) {
+          allUniqueNodes.add(baseSequence);
         }
       });
     }
@@ -103,14 +113,23 @@ export function applyConsistentPositions(graphNodes, positionMap, nodeColor, lay
   if (!graphNodes || !positionMap) return graphNodes;
   
   return graphNodes.map(node => {
-    // More robust node ID extraction - try multiple possible properties
-    const nodeId = node.id || node.data?.label || node.label || node.data?.id;
-    const position = positionMap[nodeId];
+    // Extract the base sequence from the node - remove suffix to get the original sequence
+    let baseSequence = null;
     
-    if (position) {
+    if (node.data?.label) {
+      baseSequence = node.data.label;
+    } else if (node.id) {
+      // Remove suffix (o, a1, a2, a3) to get base sequence
+      baseSequence = node.id.replace(/[oa]\d*$/, '');
+    } else if (node.label) {
+      baseSequence = node.label;
+    }
+    
+    const position = positionMap[baseSequence];
+    
+    if (position && baseSequence) {
       return {
         ...node,
-        id: nodeId, // Ensure consistent ID
         type: "graphNode",
         style: {
           background: nodeColor,
@@ -123,7 +142,7 @@ export function applyConsistentPositions(graphNodes, positionMap, nodeColor, lay
       };
     } else {
       // Log missing nodes for debugging
-      console.warn(`Node ID "${nodeId}" not found in position map. Available keys:`, Object.keys(positionMap));
+      console.warn(`Base sequence "${baseSequence}" not found in position map. Available keys:`, Object.keys(positionMap));
       
       // Fallback to original position or generate a random one
       return {
