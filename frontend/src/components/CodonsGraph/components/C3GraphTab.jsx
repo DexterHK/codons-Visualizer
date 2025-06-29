@@ -15,6 +15,7 @@ const C3GraphTab = ({
   setIsOverlaid,
   setSelections,
   layout,
+  selections = [],
 }) => {
   const handleViewChange = (viewType) => {
     setIsSeparated(viewType === "separated");
@@ -157,62 +158,74 @@ const C3GraphTab = ({
     </div>
   );
 
-  const renderSeparatedGraphs = () => (
-    <div className="separated-graphs-container">
-      <div className="separated-graph">
-        <h3>Original Graph</h3>
-        <div className="graph-wrapper">
-          <GraphV2
-            initialNodes={originalNodes}
-            initialEdges={originalEdges}
-            layoutType={layout}
-            nodeColor="#90C67C"
-            edgeColor="#6B8E5A"
-          />
-        </div>
-      </div>
-      <div className="separated-graph">
-        <h3>Alpha One Graph</h3>
-        <div className="graph-wrapper">
-          <GraphV2
-            initialNodes={alphaOneNodes}
-            initialEdges={alphaOneEdges}
-            layoutType={layout}
-            nodeColor="#60B5FF"
-            edgeColor="#4A8FCC"
-          />
-        </div>
-      </div>
-      {numOfCodons >= 3 && (
+  const renderSeparatedGraphs = () => {
+    // Filter selections for each graph type
+    const originalSelections = selections.filter(sel => sel.includes('o_sep'));
+    const alphaOneSelections = selections.filter(sel => sel.includes('a1_sep'));
+    const alphaTwoSelections = selections.filter(sel => sel.includes('a2_sep'));
+    const alphaThreeSelections = selections.filter(sel => sel.includes('a3_sep'));
+
+    return (
+      <div className="separated-graphs-container">
         <div className="separated-graph">
-          <h3>Alpha Two Graph</h3>
+          <h3>Original Graph</h3>
           <div className="graph-wrapper">
             <GraphV2
-              initialNodes={alphaTwoNodes}
-              initialEdges={alphaTwoEdges}
+              initialNodes={originalNodes}
+              initialEdges={originalEdges}
               layoutType={layout}
-              nodeColor="#f9844a"
-              edgeColor="#C6693B"
+              nodeColor="#90C67C"
+              edgeColor="#6B8E5A"
+              longestPathSelections={originalSelections}
             />
           </div>
         </div>
-      )}
-      {numOfCodons === 4 && (
         <div className="separated-graph">
-          <h3>Alpha Three Graph</h3>
+          <h3>Alpha One Graph</h3>
           <div className="graph-wrapper">
             <GraphV2
-              initialNodes={alphaThreeNodes}
-              initialEdges={alphaThreeEdges}
+              initialNodes={alphaOneNodes}
+              initialEdges={alphaOneEdges}
               layoutType={layout}
-              nodeColor="#ff6b9d"
-              edgeColor="#CC557E"
+              nodeColor="#60B5FF"
+              edgeColor="#4A8FCC"
+              longestPathSelections={alphaOneSelections}
             />
           </div>
         </div>
-      )}
-    </div>
-  );
+        {numOfCodons >= 3 && (
+          <div className="separated-graph">
+            <h3>Alpha Two Graph</h3>
+            <div className="graph-wrapper">
+              <GraphV2
+                initialNodes={alphaTwoNodes}
+                initialEdges={alphaTwoEdges}
+                layoutType={layout}
+                nodeColor="#f9844a"
+                edgeColor="#C6693B"
+                longestPathSelections={alphaTwoSelections}
+              />
+            </div>
+          </div>
+        )}
+        {numOfCodons === 4 && (
+          <div className="separated-graph">
+            <h3>Alpha Three Graph</h3>
+            <div className="graph-wrapper">
+              <GraphV2
+                initialNodes={alphaThreeNodes}
+                initialEdges={alphaThreeEdges}
+                layoutType={layout}
+                nodeColor="#ff6b9d"
+                edgeColor="#CC557E"
+                longestPathSelections={alphaThreeSelections}
+              />
+            </div>
+          </div>
+        )}
+      </div>
+    );
+  };
 
   return (
     <div className="c3-merged-graph">

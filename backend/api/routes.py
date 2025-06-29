@@ -168,10 +168,10 @@ def get_longest_path():
     """Get the longest path in a graph."""
     try:
         data = request.json
-        if not data or "codons" not in data or "numOfCodons" not in data:
+        if not data or "edges" not in data or "numOfCodons" not in data:
             return jsonify({"error": "Missing required data"}), 400
 
-        edges = data["codons"]  # This should be the direct edges array
+        edges = data["edges"]  # This should be the direct edges array
         num_nodes = int(data["numOfCodons"])
         
         longest_path_result = graph_service.get_longest_path(num_nodes, edges)

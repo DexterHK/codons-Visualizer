@@ -2,6 +2,11 @@ import { API_ENDPOINTS } from "../../../config/api";
 
 export class LongestPathService {
   static async fetchLongestPath(activeTab, numOfCodons, originalCodons, alphaOne, alphaTwo, alphaThree) {
+    // Validate input parameters
+    if (!numOfCodons || numOfCodons < 2) {
+      throw new Error("Invalid number of codons");
+    }
+
     const c3TabIndex = this.getC3TabIndex(numOfCodons);
     
     // Use the appropriate graph data based on the active tab
@@ -10,15 +15,73 @@ export class LongestPathService {
                            activeTab === 1 ? alphaOne : 
                            activeTab === 2 ? alphaTwo : alphaThree;
                            
-    if (!calculationGraph || !calculationGraph.edges || !calculationGraph.nodes) {
-      throw new Error("Invalid graph data");
+    // Check if graph data is properly loaded
+    if (!calculationGraph || typeof calculationGraph !== 'object') {
+      throw new Error("Graph data not loaded. Please wait for the graph to load completely.");
+    }
+
+    // Check if the graph has the expected structure
+    if (!calculationGraph.edges || !calculationGraph.nodes) {
+      throw new Error("Graph data is incomplete. Missing nodes or edges data. Please ensure the graph has been properly loaded.");
+    }
+
+    // Check if edges is an array and has content
+    if (!Array.isArray(calculationGraph.edges)) {
+      throw new Error("Graph edges data is not in the expected format (should be an array).");
+    }
+
+    if (calculationGraph.edges.length === 0) {
+      throw new Error("No edges found in the graph data. The graph appears to be empty.");
+    }
+
+    // Check if nodes is an array
+    if (!Array.isArray(calculationGraph.nodes)) {
+      throw new Error("Graph nodes data is not in the expected format (should be an array).");
+    }
+
+    if (calculationGraph.nodes.length === 0) {
+      throw new Error("No nodes found in the graph data. The graph appears to be empty.");
     }
 
     // Convert edges to the format expected by the backend
-    const edgesData = calculationGraph.edges.map(edge => ({
-      source: edge.source,
-      target: edge.target
-    }));
+    const edgesData = calculationGraph.edges.map(edge => {
+      // Handle different edge formats
+      if (!edge) {
+        console.warn("Invalid edge found:", edge);
+        return null;
+      }
+      
+      // If edge is an array [source, target]
+      if (Array.isArray(edge) && edge.length === 2) {
+        return {
+          source: edge[0],
+          target: edge[1]
+        };
+      }
+      
+      // If edge is an object with source and target properties
+      if (edge.source !== undefined && edge.target !== undefined) {
+        return {
+          source: edge.source,
+          target: edge.target
+        };
+      }
+      
+      // If edge has other properties like data.source, data.target (Cytoscape format)
+      if (edge.data && edge.data.source !== undefined && edge.data.target !== undefined) {
+        return {
+          source: edge.data.source,
+          target: edge.data.target
+        };
+      }
+      
+      console.warn("Invalid edge format found:", edge);
+      return null;
+    }).filter(edge => edge !== null);
+
+    if (edgesData.length === 0) {
+      throw new Error("No valid edges found in the graph data");
+    }
 
     const requestData = {
       edges: edgesData,

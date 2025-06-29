@@ -74,6 +74,7 @@ export default function GraphInner({
 
   // Effect to handle longest path highlighting
   useEffect(() => {
+    // Priority 1: Longest path highlighting (highest priority)
     if (longestPathSelections.length > 0) {
       setNodes((nds) =>
         nds.map((node) => {
@@ -82,29 +83,41 @@ export default function GraphInner({
             ...node,
             style: {
               ...node.style,
-              background: isInLongestPath ? "#FF6B6B" : nodeColor,
-              border: isInLongestPath ? "3px solid #FF1744" : "1px solid #666",
-              boxShadow: isInLongestPath ? "0 0 15px rgba(255, 107, 107, 0.6)" : "none",
+              background: isInLongestPath ? "#FFD700" : nodeColor, // Gold color
+              border: isInLongestPath ? "3px solid #FF8C00" : "1px solid #666", // Dark orange border
+              boxShadow: isInLongestPath ? "0 0 15px rgba(255, 215, 0, 0.8)" : "none", // Gold glow
             },
           };
         }),
       );
 
-      // Highlight edges that connect longest path nodes
+      // Highlight edges that connect consecutive nodes in the longest path
       setEdges((eds) =>
         eds.map((edge) => {
-          const isLongestPathEdge = longestPathSelections.includes(edge.source) && 
-                                   longestPathSelections.includes(edge.target);
+          let isLongestPathEdge = false;
+          
+          // Check if this edge connects consecutive nodes in the longest path
+          for (let i = 0; i < longestPathSelections.length - 1; i++) {
+            const currentNode = longestPathSelections[i];
+            const nextNode = longestPathSelections[i + 1];
+            
+            if ((edge.source === currentNode && edge.target === nextNode) ||
+                (edge.source === nextNode && edge.target === currentNode)) {
+              isLongestPathEdge = true;
+              break;
+            }
+          }
+          
           return {
             ...edge,
             style: {
               ...edge.style,
-              stroke: isLongestPathEdge ? "#FF1744" : edgeColor,
+              stroke: isLongestPathEdge ? "#FF8C00" : edgeColor, // Dark orange to match border
               strokeWidth: isLongestPathEdge ? 3 : 1,
             },
             markerEnd: {
               type: MarkerType.ArrowClosed,
-              color: isLongestPathEdge ? "#FF1744" : edgeColor,
+              color: isLongestPathEdge ? "#FF8C00" : edgeColor, // Dark orange to match border
             },
           };
         }),
@@ -112,79 +125,80 @@ export default function GraphInner({
       return;
     }
 
-    if (!selectedNodeId) {
+    // Priority 2: Node selection highlighting (when a specific node is clicked)
+    if (selectedNodeId) {
       setNodes((nds) =>
-        nds.map((node) => ({
-          ...node,
-          style: {
-            ...node.style,
-            background: nodeColor,
-            border: "1px solid #666",
-            boxShadow: "none",
-          },
-        })),
+        nds.map((node) => {
+          const isSelected = node.id === selectedNodeId;
+          const isConnected = initialEdges.some(
+            (e) =>
+              (e.source === selectedNodeId && e.target === node.id) ||
+              (e.target === selectedNodeId && e.source === node.id),
+          );
+
+          return {
+            ...node,
+            style: {
+              ...node.style,
+              borderRadius: "50%",
+              background: isSelected
+                ? "#0CECDD"
+                : isConnected
+                  ? "#FFF338"
+                  : "#3a3a3a",
+            },
+          };
+        }),
       );
 
       setEdges((eds) =>
-        eds.map((edge) => ({
-          ...edge,
-          style: {
-            ...edge.style,
-            stroke: edgeColor,
-            strokeWidth: 1,
-          },
-          markerEnd: {
-            type: MarkerType.ArrowClosed,
-            color: edgeColor,
-          },
-        })),
+        eds.map((edge) => {
+          const isConnected =
+            edge.source === selectedNodeId || edge.target === selectedNodeId;
+          return {
+            ...edge,
+            style: {
+              ...edge.style,
+              stroke: isConnected ? "#0CECDD" : "#5a5a5a",
+            },
+            markerEnd: {
+              type: MarkerType.ArrowClosed,
+              color: isConnected ? "#0CECDD" : "#5a5a5a",
+            },
+          };
+        }),
       );
-
       return;
     }
 
+    // Priority 3: Default state (no selections, no longest path)
     setNodes((nds) =>
-      nds.map((node) => {
-        const isSelected = node.id === selectedNodeId;
-        const isConnected = initialEdges.some(
-          (e) =>
-            (e.source === selectedNodeId && e.target === node.id) ||
-            (e.target === selectedNodeId && e.source === node.id),
-        );
-
-        return {
-          ...node,
-          style: {
-            ...node.style,
-            borderRadius: "50%",
-            background: isSelected
-              ? "#0CECDD"
-              : isConnected
-                ? "#FFF338"
-                : "#3a3a3a",
-          },
-        };
-      }),
+      nds.map((node) => ({
+        ...node,
+        style: {
+          ...node.style,
+          background: nodeColor,
+          border: "1px solid #666",
+          boxShadow: "none",
+        },
+      })),
     );
 
     setEdges((eds) =>
-      eds.map((edge) => {
-        const isConnected =
-          edge.source === selectedNodeId || edge.target === selectedNodeId;
-        return {
-          ...edge,
-          style: {
-            ...edge.style,
-            stroke: isConnected ? "#0CECDD" : "#5a5a5a",
-          },
-          markerEnd: {
-            type: MarkerType.ArrowClosed,
-            color: isConnected ? "#0CECDD" : "#5a5a5a",
-          },
-        };
-      }),
+      eds.map((edge) => ({
+        ...edge,
+        style: {
+          ...edge.style,
+          stroke: edgeColor,
+          strokeWidth: 1,
+        },
+        markerEnd: {
+          type: MarkerType.ArrowClosed,
+          color: edgeColor,
+        },
+      })),
     );
-  }, [selectedNodeId, initialEdges, setNodes, setEdges, longestPathSelections, nodeColor]);
+  }, [selectedNodeId, initialEdges, setNodes, setEdges, longestPathSelections, nodeColor, edgeColor]);
 
   useEffect(() => {
     if (!size.width || !size.height) return;
@@ -274,6 +288,59 @@ export default function GraphInner({
 
     applyLayoutAsync();
   }, [size, layoutType, initialNodes, initialEdges, setNodes, setEdges, nodeColor]);
+
+  // Separate effect to ensure highlighting is applied after layout
+  useEffect(() => {
+    if (nodes.length === 0) return; // Wait for nodes to be set
+    
+    // Re-apply longest path highlighting after layout changes
+    if (longestPathSelections.length > 0) {
+      setNodes((nds) =>
+        nds.map((node) => {
+          const isInLongestPath = longestPathSelections.includes(node.id);
+          return {
+            ...node,
+            style: {
+              ...node.style,
+              background: isInLongestPath ? "#FFD700" : nodeColor,
+              border: isInLongestPath ? "3px solid #FF8C00" : "1px solid #666",
+              boxShadow: isInLongestPath ? "0 0 15px rgba(255, 215, 0, 0.8)" : "none",
+            },
+          };
+        }),
+      );
+
+      setEdges((eds) =>
+        eds.map((edge) => {
+          let isLongestPathEdge = false;
+          
+          for (let i = 0; i < longestPathSelections.length - 1; i++) {
+            const currentNode = longestPathSelections[i];
+            const nextNode = longestPathSelections[i + 1];
+            
+            if ((edge.source === currentNode && edge.target === nextNode) ||
+                (edge.source === nextNode && edge.target === currentNode)) {
+              isLongestPathEdge = true;
+              break;
+            }
+          }
+          
+          return {
+            ...edge,
+            style: {
+              ...edge.style,
+              stroke: isLongestPathEdge ? "#FF8C00" : edgeColor,
+              strokeWidth: isLongestPathEdge ? 3 : 1,
+            },
+            markerEnd: {
+              type: MarkerType.ArrowClosed,
+              color: isLongestPathEdge ? "#FF8C00" : edgeColor,
+            },
+          };
+        }),
+      );
+    }
+  }, [nodes.length, longestPathSelections, nodeColor, edgeColor, setNodes, setEdges]);
 
   if (!nodes || !edges) return null;
 

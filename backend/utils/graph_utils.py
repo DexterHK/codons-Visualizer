@@ -188,8 +188,17 @@ def longest_path(number, edge_list):
     # Create a set of nodes from the edge list
     nodes = set()
     for edge in edge_list:
-        nodes.add(edge[0])
-        nodes.add(edge[1])
+        # Handle both object format {source: ..., target: ...} and array format [source, target]
+        if isinstance(edge, dict):
+            source = edge.get('source')
+            target = edge.get('target')
+        else:
+            source = edge[0]
+            target = edge[1]
+        
+        if source and target:
+            nodes.add(source)
+            nodes.add(target)
     
     if not nodes:
         return []
@@ -200,7 +209,16 @@ def longest_path(number, edge_list):
         graph[node] = []
     
     for edge in edge_list:
-        graph[edge[0]].append(edge[1])
+        # Handle both object format {source: ..., target: ...} and array format [source, target]
+        if isinstance(edge, dict):
+            source = edge.get('source')
+            target = edge.get('target')
+        else:
+            source = edge[0]
+            target = edge[1]
+        
+        if source and target:
+            graph[source].append(target)
     
     longest_path_found = []
     max_length = 0
