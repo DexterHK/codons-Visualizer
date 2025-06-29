@@ -109,9 +109,9 @@ export default function OverlayGraphs({
 
     if (allGraphNodes.length === 0) return;
 
-    // Assume a standard canvas size for positioning (will be scaled by GraphV2)
-    const canvasWidth = 800;
-    const canvasHeight = 600;
+    // Use a larger, more standardized canvas size for better positioning
+    const canvasWidth = 1200;
+    const canvasHeight = 800;
 
     // Create consistent layout
     const positionMap = createConsistentLayout({
@@ -120,7 +120,7 @@ export default function OverlayGraphs({
       height: canvasHeight,
     });
 
-    // Apply consistent positions to each graph
+    // Apply consistent positions to each graph with the same dimensions
     const newPositionedNodes = {
       original: originalNodes ? applyConsistentPositions(
         originalNodes,
@@ -407,6 +407,7 @@ export default function OverlayGraphs({
             layoutType={consistentPositioning ? "preset" : layout}
             nodeColor="#90C67C"
             edgeColor="#6B8E5A"
+            disableFitView={consistentPositioning}
           />
         </div>
 
@@ -423,6 +424,7 @@ export default function OverlayGraphs({
             layoutType={consistentPositioning ? "preset" : layout}
             nodeColor="#60B5FF"
             edgeColor="#4A8FCC"
+            disableFitView={consistentPositioning}
           />
         </div>
 
@@ -440,6 +442,7 @@ export default function OverlayGraphs({
               layoutType={consistentPositioning ? "preset" : layout}
               nodeColor="#E78B48"
               edgeColor="#B86F39"
+              disableFitView={consistentPositioning}
             />
           </div>
         )}
@@ -458,6 +461,7 @@ export default function OverlayGraphs({
               layoutType={consistentPositioning ? "preset" : layout}
               nodeColor="#ff69b4"
               edgeColor="#CC5490"
+              disableFitView={consistentPositioning}
             />
           </div>
         )}

@@ -38,6 +38,7 @@ export default function GraphInner({
   nodeColor,
   edgeColor = "#b1b1b7", // Default edge color
   longestPathSelections = [],
+  disableFitView = false, // New prop to disable fitView for overlay mode
 }) {
   const graphWrapperRef = React.useRef(null);
   const size = useResizeObserver(graphWrapperRef);
@@ -289,7 +290,8 @@ export default function GraphInner({
         onNodeClick={handleNodeClick}
         onPaneClick={handlePaneClick}
         connectionLineComponent={FloatingConnectionLine}
-        fitView
+        fitView={!disableFitView}
+        defaultViewport={disableFitView ? { x: 0, y: 0, zoom: 1 } : undefined}
       >
         <Controls
           style={{

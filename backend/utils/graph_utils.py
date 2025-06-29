@@ -144,17 +144,17 @@ def get_rest_1_graph(codons):
 
 def get_graph_alpha_one(number_of_codons, codons):
     """Get the alpha-one transformed codon graph."""
-    alpha_one_codons = alph1(codons)
+    alpha_one_codons = alph1(codons,number_of_codons)
     return get_graph(number_of_codons, alpha_one_codons)
 
 def get_graph_alpha_two(number_of_codons, codons):
     """Get the alpha-two transformed codon graph."""
-    alpha_two_codons = alph2(codons)
+    alpha_two_codons = alph2(codons,number_of_codons)
     return get_graph(number_of_codons, alpha_two_codons)
 
 def get_graph_alpha_three(number_of_codons, codons):
     """Get the alpha-three transformed codon graph."""
-    alpha_three_codons = alph3(codons)
+    alpha_three_codons = alph3(codons,number_of_codons)
     return get_graph(number_of_codons, alpha_three_codons)
 
 def remove_isolated_nodes(graph_data):

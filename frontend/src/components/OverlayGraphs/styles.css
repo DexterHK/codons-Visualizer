@@ -274,6 +274,22 @@
   height: 100%;
   transition: opacity 0.3s ease, z-index 0.1s ease;
   pointer-events: auto;
+  overflow: hidden; /* Prevent scrollbars */
+}
+
+.overlay-graph-layer > div {
+  width: 100% !important;
+  height: 100% !important;
+}
+
+/* Ensure ReactFlow containers are properly sized */
+.overlay-graph-layer .react-flow {
+  width: 100% !important;
+  height: 100% !important;
+}
+
+.overlay-graph-layer .react-flow__viewport {
+  transform-origin: 0 0 !important;
 }
 
 /* Scrollbar styling for overlay controls */

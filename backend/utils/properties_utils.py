@@ -1,3 +1,5 @@
+import re
+
 """
 Utility functions for properties operations.
 """
@@ -21,6 +23,12 @@ def rotations(word: str):
     """All proper (non-trivial) cyclic rotations of a word."""
     return {word[i:] + word[:i] for i in range(1, len(word))}
 
+
+def chunk(seq: str, size: int = 4) -> list[str]:
+    """Split *seq* into equally sized chunks, ignoring spaces/new-lines."""
+    clean = re.sub(r'[\s\\]+', '', seq.upper())       # remove whitespace, backslashes
+    return [clean[i:i+size] for i in range(0, len(clean), size)
+            if len(clean[i:i+size]) == size]          # skip a short tail, if any
 
 ########################################
 # 1. is_comma_free -------------------- #
@@ -165,9 +173,22 @@ def is_C3(length,code):
     A code is C³ iff the code itself *and* the two rotation codes obtained by
     shifting every word left by 1 or 2 positions are circular.                  
     """
-    if is_circular(code) & is_self_complementary(code) & is_self_complementary(code):
-        return True
-
+    codon  = ''.join(code)
+    print(codon)
+    if length == 4:
+        alpha1 = chunk(alph1(codon,length),4) 
+        alpha2 = chunk(alph2(codon,length),4) 
+        alpha3 = chunk(alph3(codon,length),4) 
+        print(is_circular(code) , is_circular(alpha1) , is_circular(alpha2) , is_circular(alpha3))
+        return is_circular(code) and is_circular(alpha1) and is_circular(alpha2) and is_circular(alpha3)
+    elif length == 3:
+        alpha1 = chunk(alph1(codon,length),4) 
+        alpha2 = chunk(alph2(codon,length),4) 
+        return is_circular(code) and is_circular(alpha1) and is_circular(alpha2)
+    elif length == 2:
+        alpha1 = chunk(alph1(codon,length),4)  
+        return is_circular(code) and is_circular(alpha1)
+    
     return False 
 ########################################
 # 4. is_self_complementary ------------ #
@@ -206,7 +227,7 @@ def analyse_code(length,code):
         comma_free          = is_comma_free(code,length),
         circular            = is_circular(code),
         maximal_self_complementary = is_maximal_self_complementary(code),
-        C3                  = is_C3(length,code)
+        **{f"C{length}": is_C3(length,code)}
     )
 
 ########################################
@@ -237,13 +258,13 @@ def properties(number, codon_input):
         "circular code": analysis['circular'],
         "comma-free": analysis['comma_free'],
         "duplicate free": analysis['duplicate_free'],
-        "C3" : analysis['C3'],
+        f"C{number}" : analysis[f'C{number}'],
     }
     return eigenshaften_parameter
 
 def properties_alpha_one(number, codon_input):
     """Get properties for alpha-one transformed codons."""
-    alpha_input = alph1(codon_input)
+    alpha_input = alph1(codon_input, number)
     parsed_input = parseinput(number, alpha_input)
     code_list = list(parsed_input)
     analysis = analyse_code(number,code_list)
@@ -254,13 +275,13 @@ def properties_alpha_one(number, codon_input):
         "circular code": analysis['circular'],
         "comma-free": analysis['comma_free'],
         "duplicate free": analysis['duplicate_free'],
-        "C3" : analysis['C3']
+        f"C{number}" : analysis[f'C{number}']
     }
     return properties_parameter1
 
 def properties_alpha_two(number, codon_input):
     """Get properties for alpha-two transformed codons."""
-    alpha_input = alph2(codon_input)
+    alpha_input = alph2(codon_input, number)
     parsed_input = parseinput(number, alpha_input)
     code_list = list(parsed_input)
     analysis = analyse_code(number,code_list)
@@ -271,7 +292,7 @@ def properties_alpha_two(number, codon_input):
         "circular code": analysis['circular'],
         "comma-free": analysis['comma_free'],
         "duplicate free": analysis['duplicate_free'],
-        "C3" : analysis['C3']
+        f"C{number}" : analysis[f'C{number}']
     }
     return properties_parameter2
 
@@ -288,7 +309,7 @@ def properties_alpha_three(number, codon_input):
         "circular code": analysis['circular'],
         "comma-free": analysis['comma_free'],
         "duplicate free": analysis['duplicate_free'],
-        "C3" : analysis['C3']
+        f"C{number}" : analysis[f'C{number}']
     }
     return properties_parameter3
 

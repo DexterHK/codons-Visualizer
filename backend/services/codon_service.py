@@ -46,16 +46,7 @@ class CodonService:
         """Check if code is duplicate-free."""
         return is_duplicate_free(code)
     
-    def apply_alpha_transformation(self, sequence: str, alpha_type: int) -> str:
-        """Apply alpha transformation to sequence."""
-        if alpha_type == 1:
-            return alph1(sequence)
-        elif alpha_type == 2:
-            return alph2(sequence)
-        elif alpha_type == 3:
-            return alph3(sequence)
-        else:
-            raise ValueError("Invalid alpha type. Must be 1, 2, or 3.")
+
     
     
     def get_component_breakdown(self, codons: list, component_index: int) -> dict:

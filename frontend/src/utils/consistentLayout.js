@@ -134,6 +134,7 @@ export function applyConsistentPositions(graphNodes, positionMap, nodeColor, lay
         style: {
           background: nodeColor,
           borderRadius: "50%",
+          ...node.style, // Preserve original node styling
         },
         position: {
           x: Math.round(position.x), // Round to avoid sub-pixel positioning issues
@@ -151,6 +152,7 @@ export function applyConsistentPositions(graphNodes, positionMap, nodeColor, lay
         style: {
           background: nodeColor,
           borderRadius: "50%",
+          ...node.style, // Preserve original node styling
         },
         position: node.position || {
           x: Math.random() * width,
