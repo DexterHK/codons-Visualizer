@@ -3,7 +3,7 @@ Service for handling graph-related operations.
 """
 from utils.graph_utils import (
     get_graph, get_graph_alpha_one, get_graph_alpha_two, 
-    get_graph_alpha_three, longest_path, all_cycles
+    get_graph_alpha_three, longest_path, all_cycles, remove_isolated_nodes
 )
 
 class GraphService:
@@ -13,20 +13,24 @@ class GraphService:
         pass
     
     def get_original_graph(self, number_of_codons: int, codons: list) -> dict:
-        """Get the original codon graph."""
-        return get_graph(number_of_codons, codons)
+        """Get the original codon graph with isolated nodes removed."""
+        graph = get_graph(number_of_codons, codons)
+        return remove_isolated_nodes(graph)
     
     def get_alpha_one_graph(self, number_of_codons: int, codons: list) -> dict:
-        """Get the alpha-one transformed codon graph."""
-        return get_graph_alpha_one(number_of_codons, codons)
+        """Get the alpha-one transformed codon graph with isolated nodes removed."""
+        graph = get_graph_alpha_one(number_of_codons, codons)
+        return remove_isolated_nodes(graph)
     
     def get_alpha_two_graph(self, number_of_codons: int, codons: list) -> dict:
-        """Get the alpha-two transformed codon graph."""
-        return get_graph_alpha_two(number_of_codons, codons)
+        """Get the alpha-two transformed codon graph with isolated nodes removed."""
+        graph = get_graph_alpha_two(number_of_codons, codons)
+        return remove_isolated_nodes(graph)
     
     def get_alpha_three_graph(self, number_of_codons: int, codons: list) -> dict:
-        """Get the alpha-three transformed codon graph."""
-        return get_graph_alpha_three(number_of_codons, codons)
+        """Get the alpha-three transformed codon graph with isolated nodes removed."""
+        graph = get_graph_alpha_three(number_of_codons, codons)
+        return remove_isolated_nodes(graph)
     
     def get_longest_path(self, num_nodes: int, edges: list) -> dict:
         """Get the longest path in a graph."""

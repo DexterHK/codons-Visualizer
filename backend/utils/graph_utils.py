@@ -49,7 +49,8 @@ def get_graph(number_of_codons, codons):
         filter(lambda x: len(x[0]) > 0 and len(x[1]) > 0, parsed_input["rows"])
     )
     
-    return {"nodes": nodes, "edges": edges}
+    graph = {"nodes": nodes, "edges": edges}
+    return remove_isolated_nodes(graph)
 
 def get_component_graph_direct(codons, component_index):
     """Get a specific component graph directly using processing_utils."""
@@ -66,7 +67,8 @@ def get_component_graph_direct(codons, component_index):
         filter(lambda x: len(x[0]) > 0 and len(x[1]) > 0, result["rows"])
     )
     
-    return {"nodes": nodes, "edges": edges}
+    graph = {"nodes": nodes, "edges": edges}
+    return remove_isolated_nodes(graph)
 
 def get_full_graph_direct(codons):
     """Get the full representing graph directly using processing_utils."""
@@ -83,7 +85,8 @@ def get_full_graph_direct(codons):
         filter(lambda x: len(x[0]) > 0 and len(x[1]) > 0, result["rows"])
     )
     
-    return {"nodes": nodes, "edges": edges}
+    graph = {"nodes": nodes, "edges": edges}
+    return remove_isolated_nodes(graph)
 
 def get_1_rest_graph(codons):
     """Get 1-rest breakdown graph using processing_utils."""
@@ -100,7 +103,8 @@ def get_1_rest_graph(codons):
         filter(lambda x: len(x[0]) > 0 and len(x[1]) > 0, result["rows"])
     )
     
-    return {"nodes": nodes, "edges": edges}
+    graph = {"nodes": nodes, "edges": edges}
+    return remove_isolated_nodes(graph)
 
 def get_2_2_graph(codons):
     """Get 2-2 breakdown graph using processing_utils."""
@@ -117,7 +121,8 @@ def get_2_2_graph(codons):
         filter(lambda x: len(x[0]) > 0 and len(x[1]) > 0, result["rows"])
     )
     
-    return {"nodes": nodes, "edges": edges}
+    graph = {"nodes": nodes, "edges": edges}
+    return remove_isolated_nodes(graph)
 
 def get_rest_1_graph(codons):
     """Get rest-1 breakdown graph using processing_utils."""
@@ -134,7 +139,8 @@ def get_rest_1_graph(codons):
         filter(lambda x: len(x[0]) > 0 and len(x[1]) > 0, result["rows"])
     )
     
-    return {"nodes": nodes, "edges": edges}
+    graph = {"nodes": nodes, "edges": edges}
+    return remove_isolated_nodes(graph)
 
 def get_graph_alpha_one(number_of_codons, codons):
     """Get the alpha-one transformed codon graph."""
@@ -150,6 +156,29 @@ def get_graph_alpha_three(number_of_codons, codons):
     """Get the alpha-three transformed codon graph."""
     alpha_three_codons = alph3(codons)
     return get_graph(number_of_codons, alpha_three_codons)
+
+def remove_isolated_nodes(graph_data):
+    """Remove nodes that have no connections (isolated nodes) from the graph."""
+    if not graph_data or "nodes" not in graph_data or "edges" not in graph_data:
+        return graph_data
+    
+    nodes = graph_data["nodes"]
+    edges = graph_data["edges"]
+    
+    # Get all nodes that are connected (appear in edges)
+    connected_nodes = set()
+    for edge in edges:
+        if len(edge) >= 2:  # Ensure edge has at least source and target
+            connected_nodes.add(edge[0])
+            connected_nodes.add(edge[1])
+    
+    # Filter nodes to only include connected ones
+    filtered_nodes = [node for node in nodes if node in connected_nodes]
+    
+    return {
+        "nodes": filtered_nodes,
+        "edges": edges
+    }
 
 def longest_path(number, edge_list):
     """Return one longest simple path in a directed graph using DFS with memoization."""
