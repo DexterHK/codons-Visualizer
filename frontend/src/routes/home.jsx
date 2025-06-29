@@ -74,7 +74,7 @@ export default function Home() {
     }
 
     if (!numOfCodons || numOfCodons < 2 || numOfCodons > 4) {
-      setError("Number of codons must be between 2 and 4.");
+      setError("Tuple Length must be between 2 and 4.");
       return;
     }
 

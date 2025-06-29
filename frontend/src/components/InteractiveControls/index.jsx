@@ -80,7 +80,7 @@ const InteractiveControls = ({ isDropdown = false }) => {
     }
 
     if (!localNumOfCodons || localNumOfCodons < 2 || localNumOfCodons > 4) {
-      setError("Number of codons must be between 2 and 4.");
+      setError("Tuple length must be between 2 and 4.");
       return;
     }
 
@@ -226,7 +226,7 @@ const InteractiveControls = ({ isDropdown = false }) => {
           </div>
 
           <div className="input-group">
-            <label htmlFor="interactive-num-codons">Number of Codons</label>
+            <label htmlFor="interactive-num-codons">Tuple Length</label>
             <input
               id="interactive-num-codons"
               type="number"
@@ -296,7 +296,7 @@ const InteractiveControls = ({ isDropdown = false }) => {
           </div>
 
           <div className="input-group">
-            <label htmlFor="interactive-num-codons">Number of Codons</label>
+            <label htmlFor="interactive-num-codons">Tuple Length</label>
             <input
               id="interactive-num-codons"
               type="number"
