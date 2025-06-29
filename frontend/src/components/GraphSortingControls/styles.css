@@ -606,3 +606,207 @@ body.light .quick-action-btn:hover {
 .graph-sorting-controls::-webkit-scrollbar-thumb:hover {
   background: rgba(255, 255, 255, 0.3);
 }
+
+/* Path Finding Controls */
+.path-finding-controls {
+  padding: 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.shortest-path-section,
+.longest-path-section {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  padding: 16px;
+  background: rgba(255, 255, 255, 0.02);
+  border: 1px solid rgba(255, 255, 255, 0.05);
+  border-radius: 12px;
+  transition: all 0.3s ease;
+}
+
+.shortest-path-section:hover,
+.longest-path-section:hover {
+  background: rgba(255, 255, 255, 0.04);
+  border-color: rgba(255, 255, 255, 0.1);
+}
+
+.path-section-title {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 8px;
+}
+
+.path-icon {
+  font-size: 16px;
+  opacity: 0.8;
+}
+
+.path-label {
+  color: var(--text-secondary);
+  font-size: 14px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.path-inputs {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.input-group {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.input-label {
+  color: var(--text-secondary);
+  font-size: 12px;
+  font-weight: 500;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.path-input {
+  padding: 12px 16px;
+  background: var(--bg-primary);
+  border: 2px solid var(--border-color);
+  border-radius: 8px;
+  color: var(--text-primary);
+  font-size: 14px;
+  font-weight: 500;
+  transition: all 0.3s ease;
+  outline: none;
+}
+
+.path-input:focus {
+  border-color: var(--accent-color);
+  background: var(--bg-hover);
+  box-shadow: 0 0 0 3px rgba(100, 108, 255, 0.1);
+}
+
+.path-input::placeholder {
+  color: var(--text-secondary);
+  opacity: 0.6;
+}
+
+.path-calculate-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  padding: 14px 20px;
+  border: 2px solid var(--border-color);
+  border-radius: 10px;
+  background: var(--bg-primary);
+  color: var(--text-primary);
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  position: relative;
+  overflow: hidden;
+}
+
+.path-calculate-btn::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(90deg, 
+    transparent, 
+    rgba(255, 255, 255, 0.1), 
+    transparent);
+  transition: left 0.5s ease;
+}
+
+.path-calculate-btn:hover::before {
+  left: 100%;
+}
+
+.path-calculate-btn:hover {
+  background: var(--accent-color);
+  color: white;
+  border-color: var(--accent-color);
+  transform: translateY(-2px);
+  box-shadow: 0 8px 25px rgba(100, 108, 255, 0.3);
+}
+
+.longest-path-btn {
+  background: linear-gradient(135deg, #f59e0b, #d97706);
+  border-color: #f59e0b;
+  color: white;
+}
+
+.longest-path-btn:hover {
+  background: linear-gradient(135deg, #d97706, #b45309);
+  border-color: #d97706;
+  box-shadow: 0 8px 25px rgba(245, 158, 11, 0.4);
+}
+
+/* Dark theme adjustments for path finding */
+body.dark .shortest-path-section,
+body.dark .longest-path-section {
+  background: rgba(255, 255, 255, 0.02);
+  border-color: rgba(255, 255, 255, 0.05);
+}
+
+body.dark .path-input {
+  background: #2a2a2a;
+  border-color: #404040;
+  color: #ffffff;
+}
+
+body.dark .path-input:focus {
+  border-color: #646cff;
+  background: #333;
+}
+
+body.dark .path-calculate-btn {
+  background: #2a2a2a;
+  border-color: #404040;
+  color: #ffffff;
+}
+
+body.dark .path-calculate-btn:hover {
+  background: #646cff;
+  border-color: #646cff;
+}
+
+/* Light theme adjustments for path finding */
+body.light .shortest-path-section,
+body.light .longest-path-section {
+  background: rgba(0, 0, 0, 0.02);
+  border-color: rgba(0, 0, 0, 0.05);
+}
+
+body.light .path-input {
+  background: #ffffff;
+  border-color: #e5e7eb;
+  color: #1f2937;
+}
+
+body.light .path-input:focus {
+  border-color: #646cff;
+  background: #f9fafb;
+}
+
+body.light .path-calculate-btn {
+  background: #ffffff;
+  border-color: #e5e7eb;
+  color: #1f2937;
+}
+
+body.light .path-calculate-btn:hover {
+  background: #646cff;
+  color: white;
+  border-color: #646cff;
+}

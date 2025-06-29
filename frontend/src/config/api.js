@@ -28,6 +28,7 @@ export const API_ENDPOINTS = {
     ALPHA_TWO: `${API_BASE_URL}/api/graphs/alpha-two`,
     ALPHA_THREE: `${API_BASE_URL}/api/graphs/alpha-three`,
     LONGEST_PATH: `${API_BASE_URL}/api/graphs/longest-path`,
+    SHORTEST_PATH: `${API_BASE_URL}/api/graphs/shortest-path`,
   },
   
   // Properties endpoints

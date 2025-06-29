@@ -3,7 +3,7 @@ Service for handling graph-related operations.
 """
 from utils.graph_utils import (
     get_graph, get_graph_alpha_one, get_graph_alpha_two, 
-    get_graph_alpha_three, longest_path, all_cycles, remove_isolated_nodes
+    get_graph_alpha_three, longest_path, shortest_path, all_cycles, remove_isolated_nodes
 )
 
 class GraphService:
@@ -35,6 +35,10 @@ class GraphService:
     def get_longest_path(self, num_nodes: int, edges: list) -> dict:
         """Get the longest path in a graph."""
         return longest_path(num_nodes, edges)
+    
+    def get_shortest_path(self, edges: list, source: str, target: str, nodes: list) -> list:
+        """Get the shortest path between two nodes in a graph."""
+        return shortest_path(edges, source, target, nodes)
     
     def get_all_cycles(self, edge_list: list) -> list:
         """Get all cycles in a graph."""

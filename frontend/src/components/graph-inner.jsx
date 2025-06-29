@@ -72,52 +72,57 @@ export default function GraphInner({
     setSelectedNodeId(null);
   }, []);
 
-  // Effect to handle longest path highlighting
+  // Effect to handle path highlighting (both longest and shortest paths)
   useEffect(() => {
-    // Priority 1: Longest path highlighting (highest priority)
+    // Priority 1: Path highlighting (highest priority) - supports both longest and shortest paths
     if (longestPathSelections.length > 0) {
+      // Determine if this is a shortest path (different color scheme)
+      const isShortestPath = longestPathSelections.some(id => id.includes('shortest'));
+      
       setNodes((nds) =>
         nds.map((node) => {
-          const isInLongestPath = longestPathSelections.includes(node.id);
+          const isInPath = longestPathSelections.includes(node.id);
           return {
             ...node,
             style: {
               ...node.style,
-              background: isInLongestPath ? "#FFD700" : nodeColor, // Gold color
-              border: isInLongestPath ? "3px solid #FF8C00" : "1px solid #666", // Dark orange border
-              boxShadow: isInLongestPath ? "0 0 15px rgba(255, 215, 0, 0.8)" : "none", // Gold glow
+              background: isInPath ? (isShortestPath ? "#00CED1" : "#FFD700") : nodeColor, // Cyan for shortest, Gold for longest
+              border: isInPath ? (isShortestPath ? "3px solid #008B8B" : "3px solid #FF8C00") : "1px solid #666", // Dark cyan/orange border
+              boxShadow: isInPath ? (isShortestPath ? "0 0 15px rgba(0, 206, 209, 0.8)" : "0 0 15px rgba(255, 215, 0, 0.8)") : "none", // Cyan/Gold glow
             },
           };
         }),
       );
 
-      // Highlight edges that connect consecutive nodes in the longest path
+      // Highlight edges that connect consecutive nodes in the path
       setEdges((eds) =>
         eds.map((edge) => {
-          let isLongestPathEdge = false;
+          let isPathEdge = false;
           
-          // Check if this edge connects consecutive nodes in the longest path
+          // Check if this edge connects consecutive nodes in the path
           for (let i = 0; i < longestPathSelections.length - 1; i++) {
             const currentNode = longestPathSelections[i];
             const nextNode = longestPathSelections[i + 1];
             
             if ((edge.source === currentNode && edge.target === nextNode) ||
                 (edge.source === nextNode && edge.target === currentNode)) {
-              isLongestPathEdge = true;
+              isPathEdge = true;
               break;
             }
           }
+          
+          const pathColor = isShortestPath ? "#008B8B" : "#FF8C00"; // Dark cyan for shortest, dark orange for longest
           
           return {
             ...edge,
             style: {
               ...edge.style,
-              stroke: isLongestPathEdge ? "#FF8C00" : edgeColor, // Dark orange to match border
-              strokeWidth: isLongestPathEdge ? 3 : 1,
+              stroke: isPathEdge ? pathColor : edgeColor,
+              strokeWidth: isPathEdge ? 3 : 1,
             },
             markerEnd: {
               type: MarkerType.ArrowClosed,
-              color: isLongestPathEdge ? "#FF8C00" : edgeColor, // Dark orange to match border
+              color: isPathEdge ? pathColor : edgeColor,
             },
           };
         }),

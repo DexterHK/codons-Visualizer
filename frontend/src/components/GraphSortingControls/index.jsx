@@ -8,11 +8,17 @@ const GraphSortingControls = ({
   nodeSortType = 'alphabetical',
   isOptimized = false,
   currentLayout = 'force',
-  toggleLongestPath
+  toggleLongestPath,
+  calculateShortestPath,
+  shortestPathSource,
+  setShortestPathSource,
+  shortestPathTarget,
+  setShortestPathTarget
 }) => {
   const [expandedSections, setExpandedSections] = useState({
     layoutAlgorithms: true,
     advancedLayouts: false,
+    pathFinding: true,
     optimization: true
   });
 
@@ -24,13 +30,6 @@ const GraphSortingControls = ({
   };
 
   const basicLayoutOptions = [
-    ...(toggleLongestPath ? [{
-      value: 'longest-path',
-      label: 'Longest Path',
-      icon: '🛤️',
-      description: 'Toggle longest path highlighting',
-      isAction: true
-    }] : []),
     {
       value: 'force',
       label: 'Force Directed',
@@ -198,6 +197,85 @@ const GraphSortingControls = ({
           )}
         </div>
 
+        {/* Path Finding Section */}
+        {(calculateShortestPath || toggleLongestPath) && (
+          <div className="control-section">
+            <div 
+              className="section-header clickable"
+              onClick={() => toggleSection('pathFinding')}
+            >
+              <span className="section-icon">🗺️</span>
+              <label className="section-label">Path Finding</label>
+              <span className={`chevron ${expandedSections.pathFinding ? 'expanded' : ''}`}>▼</span>
+            </div>
+            
+            {expandedSections.pathFinding && (
+              <div className="path-finding-controls">
+                {/* Shortest Path Controls */}
+                {calculateShortestPath && (
+                  <div className="shortest-path-section">
+                    <div className="path-section-title">
+                      <span className="path-icon">🎯</span>
+                      <span className="path-label">Shortest Path</span>
+                    </div>
+                    
+                    <div className="path-inputs">
+                      <div className="input-group">
+                        <label className="input-label">Source Node:</label>
+                        <input
+                          type="text"
+                          className="path-input"
+                          placeholder="e.g., TG"
+                          value={shortestPathSource || ''}
+                          onChange={(e) => setShortestPathSource && setShortestPathSource(e.target.value)}
+                        />
+                      </div>
+                      
+                      <div className="input-group">
+                        <label className="input-label">Target Node:</label>
+                        <input
+                          type="text"
+                          className="path-input"
+                          placeholder="e.g., AA"
+                          value={shortestPathTarget || ''}
+                          onChange={(e) => setShortestPathTarget && setShortestPathTarget(e.target.value)}
+                        />
+                      </div>
+                    </div>
+                    
+                    <button 
+                      className="path-calculate-btn"
+                      onClick={calculateShortestPath}
+                      title="Calculate and highlight the shortest path between source and target nodes"
+                    >
+                      <span className="btn-icon">🔍</span>
+                      <span className="btn-text">Find Shortest Path</span>
+                    </button>
+                  </div>
+                )}
+                
+                {/* Longest Path Controls */}
+                {toggleLongestPath && (
+                  <div className="longest-path-section">
+                    <div className="path-section-title">
+                      <span className="path-icon">🛤️</span>
+                      <span className="path-label">Longest Path</span>
+                    </div>
+                    
+                    <button 
+                      className="path-calculate-btn longest-path-btn"
+                      onClick={toggleLongestPath}
+                      title="Toggle longest path highlighting"
+                    >
+                      <span className="btn-icon">🛤️</span>
+                      <span className="btn-text">Toggle Longest Path</span>
+                    </button>
+                  </div>
+                )}
+              </div>
+            )}
+          </div>
+        )}
 
         {/* Layout Optimization Section */}
         <div className="control-section">

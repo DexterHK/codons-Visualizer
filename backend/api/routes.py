@@ -179,3 +179,22 @@ def get_longest_path():
 
     except Exception as e:
         return jsonify({"error": str(e)}), 500
+
+@api_bp.route("/graphs/shortest-path", methods=["POST"])
+def get_shortest_path():
+    """Get the shortest path between two nodes in a graph."""
+    try:
+        data = request.json
+        if not data or "edges" not in data or "source" not in data or "target" not in data:
+            return jsonify({"error": "Missing required data"}), 400
+
+        edges = data["edges"]
+        source = data["source"]
+        target = data["target"]
+        nodes = data.get("nodes", [])
+        
+        shortest_path_result = graph_service.get_shortest_path(edges, source, target, nodes)
+        return jsonify(shortest_path_result), 200
+
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500

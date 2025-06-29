@@ -246,3 +246,70 @@ def longest_path(number, edge_list):
         dfs(start_node, path, visited)
     
     return longest_path_found
+
+def shortest_path(edge_list, source, target, nodes=None):
+    """Find the shortest path between two nodes using BFS."""
+    if not edge_list:
+        return []
+    
+    # Create a set of nodes from the edge list if not provided
+    if nodes is None:
+        nodes = set()
+        for edge in edge_list:
+            # Handle both object format {source: ..., target: ...} and array format [source, target]
+            if isinstance(edge, dict):
+                edge_source = edge.get('source')
+                edge_target = edge.get('target')
+            else:
+                edge_source = edge[0]
+                edge_target = edge[1]
+            
+            if edge_source and edge_target:
+                nodes.add(edge_source)
+                nodes.add(edge_target)
+    
+    # Check if source and target exist in the graph
+    if source not in nodes or target not in nodes:
+        return []
+    
+    # If source and target are the same, return single node path
+    if source == target:
+        return [source]
+    
+    # Build adjacency list
+    graph = {}
+    for node in nodes:
+        graph[node] = []
+    
+    for edge in edge_list:
+        # Handle both object format {source: ..., target: ...} and array format [source, target]
+        if isinstance(edge, dict):
+            edge_source = edge.get('source')
+            edge_target = edge.get('target')
+        else:
+            edge_source = edge[0]
+            edge_target = edge[1]
+        
+        if edge_source and edge_target:
+            graph[edge_source].append(edge_target)
+    
+    # BFS to find shortest path
+    from collections import deque
+    
+    queue = deque([(source, [source])])
+    visited = {source}
+    
+    while queue:
+        current_node, path = queue.popleft()
+        
+        # Check all neighbors
+        for neighbor in graph.get(current_node, []):
+            if neighbor == target:
+                return path + [neighbor]
+            
+            if neighbor not in visited:
+                visited.add(neighbor)
+                queue.append((neighbor, path + [neighbor]))
+    
+    # No path found
+    return []

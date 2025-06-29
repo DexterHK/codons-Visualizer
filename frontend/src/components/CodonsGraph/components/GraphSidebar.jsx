@@ -22,6 +22,11 @@ const GraphSidebar = ({
   numOfCodons,
   activeTab,
   toggleLongestPath,
+  calculateShortestPath,
+  shortestPathSource,
+  setShortestPathSource,
+  shortestPathTarget,
+  setShortestPathTarget,
 }) => {
   const handleLayoutChange = (layoutType) => {
     if (setCurrentLayout) {
@@ -42,6 +47,11 @@ const GraphSidebar = ({
           isOptimized={enableOptimization}
           currentLayout={currentLayout || 'force'}
           toggleLongestPath={toggleLongestPath}
+          calculateShortestPath={calculateShortestPath}
+          shortestPathSource={shortestPathSource}
+          setShortestPathSource={setShortestPathSource}
+          shortestPathTarget={shortestPathTarget}
+          setShortestPathTarget={setShortestPathTarget}
         />
       </div>
 

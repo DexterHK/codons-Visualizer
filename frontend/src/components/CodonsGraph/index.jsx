@@ -5,6 +5,7 @@ import { useGraphData } from "./hooks/useGraphData";
 import { GraphMergeService } from "./services/GraphMergeService";
 import { ExportService } from "./services/ExportService";
 import { LongestPathService } from "./services/LongestPathService";
+import { ShortestPathService } from "./services/ShortestPathService";
 import { GraphUtils } from "./utils/GraphUtils";
 import GraphHeader from "./components/GraphHeader";
 import SingleGraphTab from "./components/SingleGraphTab";
@@ -27,6 +28,8 @@ const CodonsGraph = () => {
   const [selections, setSelections] = useState([]);
   const [isSeparated, setIsSeparated] = useState(false);
   const [isOverlaid, setIsOverlaid] = useState(false);
+  const [shortestPathSource, setShortestPathSource] = useState('');
+  const [shortestPathTarget, setShortestPathTarget] = useState('');
   const [nodeSortType, setNodeSortType] = useState('alphabetical');
   const [enableOptimization, setEnableOptimization] = useState(false);
   const [isHeaderCollapsed, setIsHeaderCollapsed] = useState(false);
@@ -160,7 +163,100 @@ const CodonsGraph = () => {
     }
   };
 
+  const calculateShortestPath = async () => {
+    // If there are already selections, clear them to toggle off
+    if (selections.length > 0) {
+      setSelections([]);
+      return;
+    }
 
+    try {
+      // Validate inputs
+      if (!shortestPathSource.trim() || !shortestPathTarget.trim()) {
+        alert("Please enter both source and target nodes.");
+        return;
+      }
+
+      // Check if graph data is loaded
+      if (!graphData.numOfCodons) {
+        console.error("Graph data not loaded yet");
+        alert("Please wait for the graph data to load completely before calculating the shortest path.");
+        return;
+      }
+
+      // Additional validation to check if the current tab has valid graph data
+      const c3TabIndex = GraphUtils.getC3TabIndex(graphData.numOfCodons);
+      let currentGraphData;
+      
+      if (activeTab === c3TabIndex) {
+        currentGraphData = graphData.originalCodons;
+      } else if (activeTab === 0) {
+        currentGraphData = graphData.originalCodons;
+      } else if (activeTab === 1) {
+        currentGraphData = graphData.alphaOne;
+      } else if (activeTab === 2) {
+        currentGraphData = graphData.alphaTwo;
+      } else if (activeTab === 3) {
+        currentGraphData = graphData.alphaThree;
+      }
+
+      // Check if the current graph data is properly loaded
+      if (!currentGraphData || typeof currentGraphData !== 'object' || 
+          Object.keys(currentGraphData).length === 0) {
+        alert("Graph data for the current tab is not loaded yet. Please wait for the data to load completely or try switching to a different tab.");
+        return;
+      }
+
+      const shortestPath = await ShortestPathService.fetchShortestPath(
+        activeTab,
+        graphData.numOfCodons,
+        graphData.originalCodons,
+        graphData.alphaOne,
+        graphData.alphaTwo,
+        graphData.alphaThree,
+        shortestPathSource.trim(),
+        shortestPathTarget.trim()
+      );
+
+      const convertedPath = ShortestPathService.convertPathForTab(
+        shortestPath,
+        activeTab,
+        graphData.numOfCodons,
+        isSeparated,
+        isOverlaid
+      );
+
+      setSelections(convertedPath);
+    } catch (error) {
+      console.error("Error fetching shortest path:", error);
+      
+      // Provide more user-friendly error messages
+      let userMessage = error.message;
+      if (error.message.includes("Graph data not loaded")) {
+        userMessage = "The graph data is still loading. Please wait a moment and try again.";
+      } else if (error.message.includes("No edges found") || error.message.includes("No valid edges found")) {
+        userMessage = "The current graph has no connections between nodes. Please ensure the graph data is properly loaded or try a different tab.";
+      } else if (error.message.includes("Graph data is incomplete")) {
+        userMessage = "The graph data is incomplete. Please refresh the page and ensure all data is loaded properly.";
+      } else if (error.message.includes("Failed to fetch shortest path")) {
+        userMessage = "Unable to calculate the shortest path. Please check your connection and try again.";
+      } else if (error.message.includes("does not exist in the graph")) {
+        userMessage = error.message; // Keep the specific node error message
+      } else if (error.message.includes("No path found between")) {
+        userMessage = `${error.message}. This means these nodes are not connected in the current graph. Try different nodes or check if they exist in the selected tab.`;
+      }
+      
+      // Use a more informative dialog instead of alert
+      if (error.message.includes("No path found between")) {
+        console.info(`Shortest path result: ${userMessage}`);
+        // Don't show this as an error since it's a valid result
+        alert(`Path Search Result: ${userMessage}`);
+      } else {
+        console.error("Error calculating shortest path:", error);
+        alert(`Failed to calculate shortest path: ${userMessage}`);
+      }
+    }
+  };
 
   const c3TabIndex = GraphUtils.getC3TabIndex(graphData.numOfCodons);
   const mergedGraph = graphMergeService ? 
@@ -294,6 +390,11 @@ const CodonsGraph = () => {
         numOfCodons={graphData.numOfCodons}
         activeTab={activeTab}
         toggleLongestPath={toggleLongestPath}
+        calculateShortestPath={calculateShortestPath}
+        shortestPathSource={shortestPathSource}
+        setShortestPathSource={setShortestPathSource}
+        shortestPathTarget={shortestPathTarget}
+        setShortestPathTarget={setShortestPathTarget}
       />
     </main>
   );
