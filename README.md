@@ -124,5 +124,5 @@ pnpm dev
 - **Vite**: Build tool and development server
 - **Zustand**: State management
 - **React Router**: Client-side routing
-- **Reagraph**: Graph visualization
+- **React-Flow**: Graph visualization
 - **File-saver**: File download functionality
