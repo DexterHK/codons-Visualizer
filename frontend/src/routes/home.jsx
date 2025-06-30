@@ -240,7 +240,7 @@ export default function Home() {
         <div className="title-wrapper">
           <Dna size={64} color="#646cff" />
           <h1 className="title">
-            Codon<span className="gradient-text">Analysis</span>
+            Codon<span className="gradient-text">Visualizer</span>
           </h1>
         </div>
         <p className="desc">
