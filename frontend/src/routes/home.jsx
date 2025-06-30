@@ -244,8 +244,7 @@ export default function Home() {
           </h1>
         </div>
         <p className="desc">
-          Analyze DNA sequences by identifying and translating codons into amino
-          acids.
+          Analyze DNA sequences.
         </p>
       </div>
       <div>
